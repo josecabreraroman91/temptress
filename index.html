@@ -625,7 +625,7 @@ function borrarCat(i){
 }
 function subirLogo(inp){
   const f=inp.files&&inp.files[0];if(!f)return;
-  comprimir(f,200,d=>{S.tienda.logo=d;save();render();toast('Logo cargado ✓');});
+  comprimir(f,200,d=>{S.tienda.logo=d;S.tienda.logoUserSet=true;save();render();toast('Logo cargado ✓');});
 }
 function bajarRespaldo(){
   const b=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});
@@ -984,6 +984,9 @@ function boot(){
   mesActivo=ymHoy();
   document.documentElement.style.setProperty('--satin','url("'+TEX_SATIN+'")');
   if(!load()){ S=estadoInicial(); cargarDemo(); }
+  /* Migración: en versiones viejas se sembraba un logo pegado. Si hay un logo
+     guardado que NO subió el usuario, lo limpiamos (queda el nombre sobre el satén). */
+  else if(S.tienda.logo && !S.tienda.logoUserSet){ S.tienda.logo=''; save(); }
   try{ discreto=localStorage.getItem('tienda_discreto')==='1'; }catch(e){}
   document.body.classList.toggle('discreto',discreto);
   document.querySelectorAll('.js-disc').forEach(b=>b.classList.toggle('on',discreto));
