@@ -339,9 +339,7 @@ const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).sli
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /* Guaraníes: enteros, con punto de miles. No hay centavos en Gs. */
 const gs=n=>{n=Math.round(Number(n)||0);return (n<0?'-':'')+Math.abs(n).toLocaleString('es-PY')+' Gs';}
-const gsCorto=n=>{n=Math.round(Number(n)||0);const a=Math.abs(n);
-  if(a>=1e6)return (n/1e6).toFixed(a>=1e7?0:1).replace('.',',')+'M';
-  if(a>=1e3)return Math.round(n/1e3)+'k';return String(n);}
+const gsCorto=n=>{n=Math.round(Number(n)||0);return (n<0?'-':'')+Math.abs(n).toLocaleString('es-PY');} /* guaraníes: número completo con separador de miles, sin k/M */
 /* Acepta "150.000", "150000", "150 000" → 150000 */
 const num=v=>{const d=String(v==null?'':v).replace(/[^\d-]/g,'');const n=parseInt(d,10);return isFinite(n)?n:0;}
 const hoyISO=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
