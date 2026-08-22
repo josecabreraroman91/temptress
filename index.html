@@ -741,7 +741,7 @@ function pintarProd(){
   let h='<h3>'+(esNuevo?'Nuevo producto':'Editar producto')+'</h3>';
   h+='<div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">'+
      '<div class="thumb" style="width:70px;height:70px;font-size:26px">'+(p.foto?'<img src="'+esc(p.foto)+'">':'📦')+'</div>'+
-     '<div style="flex:1"><label>Foto</label><input type="file" accept="image/*" capture="environment" onchange="fotoProd(this)">'+
+     '<div style="flex:1"><label>Foto</label><input type="file" accept="image/*" onchange="fotoProd(this)">'+
      (p.foto?'<button class="linkbtn del" onclick="editProd.foto=\'\';pintarProd()">quitar foto</button>':'')+'</div></div>';
   h+='<div class="field"><label>Nombre</label><input id="pr_nom" value="'+esc(p.nombre)+'" placeholder="Ej: Gel efecto calor 50ml"></div>';
   h+='<div class="field"><label>Categoría</label><select id="pr_cat" onchange="catSelChange(this)">'+
