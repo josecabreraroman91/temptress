@@ -1060,62 +1060,75 @@ function cargarDemo(){
   save();render();toast('Datos de ejemplo cargados ✓');
 }
 
-/* ---------------------- PANEL DE PERMISOS (solo súper admin) ---------------------- */
+/* ---------------------- PANEL DE ACCESOS (solo súper admin) ----------------------
+   Mismo modelo que la Academia DG: nodo usuarios/{correo con puntos→comas} =
+   { nombre, activo:true, rol:'admin'|'empleado' }. José escribe el correo y lo
+   da de alta; puede dar de baja (bloquea sin borrar) o eliminar. */
 const ROL_LABEL={super:'Súper admin', admin:'Administradora', empleado:'Empleado'};
+const aCorreo=k=>String(k||'').replace(/,/g,'.');
 function abrirPermisos(){
   if(rol!=='super'){ toast('Solo el administrador principal'); return; }
-  sheet('<h3>Usuarios y permisos</h3><div id="permCont"><div class="spin" style="margin:20px auto"></div></div>'+
-        '<button class="btn btn-ghost" style="margin-top:12px" onclick="cerrarModal()">Cerrar</button>');
-  Promise.all([_fbdb().ref('solicitudes').get(), _fbdb().ref('permisos').get()]).then(([sol,per])=>{
-    const sols=sol.exists()?sol.val():{}, pers=per.exists()?per.val():{};
-    let h='';
-    const claves=Object.keys(sols);
-    if(claves.length){
-      h+='<div class="sectit">Pedidos de acceso <span class="cnt">'+claves.length+'</span></div><div class="card">';
-      claves.forEach(uid=>{
-        const s=sols[uid];
-        h+='<div class="prod" style="flex-wrap:wrap">'+
-           '<div class="pinfo"><div class="pname disc-hide">'+esc(s.nombre||'Sin nombre')+'</div>'+
-           '<div class="pmeta">'+esc(s.email||'')+'</div></div>'+
-           '<div class="btn-row" style="margin:6px 0 0;width:100%">'+
-           '<button class="btn btn-brand" onclick="aprobarSolicitud(\''+uid+'\',\'admin\')">Habilitar como Admin</button>'+
-           '<button class="btn btn-ghost" onclick="aprobarSolicitud(\''+uid+'\',\'empleado\')">Empleado</button>'+
-           '</div></div>';
-      });
-      h+='</div>';
-    }
-    const ukeys=Object.keys(pers);
-    h+='<div class="sectit">Con acceso <span class="cnt">'+(ukeys.length+1)+'</span></div><div class="card">';
+  sheet('<h3>Accesos</h3>'+
+    '<div class="hint" style="margin-bottom:12px">Cargá el correo de Google de quien quieras que entre. Solo esos correos pueden ingresar.</div>'+
+    '<div class="card pad">'+
+      '<div class="field"><label>Correo de Google</label><input id="nvMail" type="email" placeholder="correo@gmail.com" autocomplete="off"></div>'+
+      '<div class="field"><label>Nombre (para reconocerlo)</label><input id="nvNom" placeholder="Ej: María, empleada"></div>'+
+      '<label>Rol</label>'+
+      '<div class="tabs" style="margin-bottom:12px"><button id="rolAdmin" class="on" onclick="_selRol(\'admin\')">Administradora</button>'+
+      '<button id="rolEmp" onclick="_selRol(\'empleado\')">Empleado</button></div>'+
+      '<div id="errNuevo" class="hint" style="color:var(--bad);margin-bottom:8px"></div>'+
+      '<button class="btn btn-brand" onclick="agregarPorCorreo()">+ Dar acceso</button></div>'+
+    '<div id="permCont"><div class="spin" style="margin:20px auto"></div></div>'+
+    '<button class="btn btn-ghost" style="margin-top:12px" onclick="cerrarModal()">Cerrar</button>');
+  _rolNuevo='admin';
+  listarUsuarios();
+}
+let _rolNuevo='admin';
+function _selRol(r){ _rolNuevo=r; var a=$('rolAdmin'),e=$('rolEmp'); if(a)a.classList.toggle('on',r==='admin'); if(e)e.classList.toggle('on',r==='empleado'); }
+function listarUsuarios(){
+  _fbdb().ref('usuarios').get().then(snap=>{
+    const us=snap.exists()?snap.val():{};
+    const ks=Object.keys(us);
+    let h='<div class="sectit">Con acceso <span class="cnt">'+(ks.length+1)+'</span></div><div class="card">';
     h+='<div class="prod"><div class="pinfo"><div class="pname">Vos</div><div class="pmeta">'+esc(SUPER_ADMIN)+'</div></div>'+
        '<span class="chip c-gold">Súper admin</span></div>';
-    ukeys.forEach(uid=>{
-      const p=pers[uid];
-      h+='<div class="prod" style="flex-wrap:wrap"><div class="pinfo"><div class="pname disc-hide">'+esc(p.nombre||p.email||uid)+'</div>'+
-         '<div class="pmeta">'+esc(p.email||'')+' · '+esc(ROL_LABEL[p.rol]||p.rol)+'</div></div>'+
+    ks.forEach(k=>{
+      const f=us[k], act=f.activo===true;
+      h+='<div class="prod" style="flex-wrap:wrap;opacity:'+(act?'1':'.55')+'">'+
+         '<div class="pinfo"><div class="pname disc-hide">'+esc(f.nombre||aCorreo(k))+'</div>'+
+         '<div class="pmeta">'+esc(aCorreo(k))+' · '+esc(ROL_LABEL[f.rol]||f.rol||'—')+(act?'':' · dado de baja')+'</div></div>'+
          '<div class="btn-row" style="margin:6px 0 0;width:100%">'+
-         '<button class="btn btn-ghost" onclick="cambiarRolUsuario(\''+uid+'\',\''+(p.rol==='admin'?'empleado':'admin')+'\')">Pasar a '+(p.rol==='admin'?'Empleado':'Admin')+'</button>'+
-         '<button class="btn btn-danger" onclick="quitarUsuario(\''+uid+'\')">Quitar acceso</button>'+
+         '<button class="btn btn-ghost" onclick="cambiarRolUsuario(\''+esc(k)+'\',\''+(f.rol==='admin'?'empleado':'admin')+'\')">A '+(f.rol==='admin'?'Empleado':'Admin')+'</button>'+
+         '<button class="btn btn-ghost" onclick="darBaja(\''+esc(k)+'\','+(!act)+')">'+(act?'Dar de baja':'Reactivar')+'</button>'+
+         '<button class="btn btn-danger" onclick="quitarUsuario(\''+esc(k)+'\')">Eliminar</button>'+
          '</div></div>';
     });
-    if(!ukeys.length) h+='<div class="empty" style="padding:14px">Todavía nadie más habilitado.</div>';
+    if(!ks.length) h+='<div class="empty" style="padding:14px">Todavía no cargaste a nadie. Escribí un correo arriba.</div>';
     h+='</div>';
-    if(!claves.length && !ukeys.length) h='<div class="empty">Cuando alguien entre con Google, va a aparecer acá para que lo habilites.</div>'+h;
     const c=$('permCont'); if(c) c.innerHTML=h;
   }).catch(e=>{ const c=$('permCont'); if(c) c.innerHTML='<div class="gate-msg">No se pudo leer. '+esc((e&&e.message)||'')+'</div>'; });
 }
-function aprobarSolicitud(uid, rolNuevo){
-  _fbdb().ref('solicitudes/'+uid).get().then(s=>{
-    const d=s.exists()?s.val():{};
-    return _fbdb().ref('permisos/'+uid).set({rol:rolNuevo, email:d.email||'', nombre:d.nombre||'', ts:Date.now()})
-      .then(()=>_fbdb().ref('solicitudes/'+uid).remove());
-  }).then(()=>{ toast('Habilitado ✓'); abrirPermisos(); }).catch(e=>toast('No se pudo: '+((e&&e.message)||'')));
+function agregarPorCorreo(){
+  const mail=($('nvMail').value||'').trim().toLowerCase();
+  const nom=($('nvNom').value||'').trim();
+  const er=$('errNuevo');
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)){ er.textContent='Ese correo no parece válido.'; return; }
+  if(!nom){ er.textContent='Poné un nombre para reconocerlo.'; return; }
+  er.textContent='';
+  const k=emailKey(mail);
+  _fbdb().ref('usuarios/'+k).set({nombre:nom, activo:true, rol:_rolNuevo, ts:Date.now()})
+    .then(()=>{ toast('Acceso dado ✓'); $('nvMail').value=''; $('nvNom').value=''; listarUsuarios(); })
+    .catch(e=>{ er.textContent='No se pudo: '+((e&&e.message)||''); });
 }
-function cambiarRolUsuario(uid, rolNuevo){
-  _fbdb().ref('permisos/'+uid+'/rol').set(rolNuevo).then(()=>{ toast('Rol actualizado'); abrirPermisos(); }).catch(e=>toast('No se pudo'));
+function cambiarRolUsuario(k, rolNuevo){
+  _fbdb().ref('usuarios/'+k+'/rol').set(rolNuevo).then(()=>{ toast('Rol actualizado'); listarUsuarios(); }).catch(e=>toast('No se pudo'));
 }
-function quitarUsuario(uid){
-  if(!confirm('¿Quitar el acceso de este usuario?')) return;
-  _fbdb().ref('permisos/'+uid).remove().then(()=>{ toast('Acceso quitado'); abrirPermisos(); }).catch(e=>toast('No se pudo'));
+function darBaja(k, activar){
+  _fbdb().ref('usuarios/'+k+'/activo').set(!!activar).then(()=>{ toast(activar?'Reactivado':'Dado de baja'); listarUsuarios(); }).catch(e=>toast('No se pudo'));
+}
+function quitarUsuario(k){
+  if(!confirm('¿Eliminar a este usuario definitivamente? Va a perder el acceso al instante.')) return;
+  _fbdb().ref('usuarios/'+k).remove().then(()=>{ toast('Eliminado'); listarUsuarios(); }).catch(e=>toast('No se pudo'));
 }
 
 /* ============================ ACCESO Y NUBE (Firebase) ============================ */
@@ -1137,8 +1150,7 @@ function gateLogin(){
 function gateCargando(txt){ mostrarGate(); gate('<div class="spin"></div>'+(txt?'<div class="gate-msg">'+esc(txt)+'</div>':'')); }
 function gateSinAcceso(email){
   mostrarGate();
-  gate('<div class="gate-msg"><b>Todavía no tenés acceso.</b><br>Le avisamos al administrador para que te habilite. '+
-    'Probá de nuevo en un rato.</div>'+
+  gate('<div class="gate-msg"><b>Tu acceso no está habilitado.</b><br>Pedile al administrador que dé de alta este correo.</div>'+
     '<div class="gate-mail">'+esc(email)+'</div>'+
     '<button class="gbtn" style="max-width:220px;margin-top:8px" onclick="location.reload()">Reintentar</button>'+
     '<button class="linkbtn" onclick="salir()">Salir</button>');
@@ -1161,14 +1173,15 @@ function entrarGoogle(){
 }
 function salir(){ if(_fbAuth) _fbAuth.signOut().then(()=>location.reload()); }
 
-/* Resolver el rol del usuario: súper admin por correo, o lo que diga /permisos/<uid>. */
+/* Resolver el rol: súper admin por correo, o lo que diga usuarios/{correo} (modelo Academia DG).
+   Solo entra si está activo. */
 function resolverRol(u){
   if((u.email||'').toLowerCase()===SUPER_ADMIN){ return Promise.resolve('super'); }
-  return _fbdb().ref('permisos/'+u.uid+'/rol').get().then(s=> s.exists()? s.val() : null );
-}
-/* Registrar un pedido de acceso para que el súper admin lo apruebe. */
-function pedirAcceso(u){
-  try{ _fbdb().ref('solicitudes/'+u.uid).set({email:u.email||'', nombre:u.displayName||'', ts:Date.now()}); }catch(e){}
+  return _fbdb().ref('usuarios/'+emailKey(u.email)).get().then(s=>{
+    const f=s.val();
+    if(f && f.activo===true) return f.rol||'empleado';
+    return null;
+  });
 }
 
 /* Al entrar con acceso: traer datos de la nube (o migrar los locales) y escuchar cambios en vivo. */
@@ -1214,7 +1227,7 @@ function iniciarFirebase(){
       gateCargando('Verificando acceso…');
       resolverRol(u).then(r=>{
         if(r){ rol=r; arrancarApp(u); }
-        else { rol=null; pedirAcceso(u); gateSinAcceso(u.email||''); }
+        else { rol=null; gateSinAcceso(u.email||''); }
       }).catch(err=>{ gateError((err&&err.message)||'Error de permisos'); });
     });
   }catch(e){ gateError('No se pudo iniciar Firebase. '+((e&&e.message)||'')); }
@@ -1236,7 +1249,7 @@ Object.assign(window,{irA,cambiarMes,mesHoy,abrirProd,pintarProd,guardarProd,bor
   abrirPed,pintarPed,guardarPed,borrarPed,abrirElegirProd,elegirProd,filtrarElegir,cambiarCant,actualizarTotPed,
   copiarResumenPedido,copiarCatalogo,cerrarModal,toggleDiscreto,guardarAjustes,agregarCat,borrarCat,subirLogo,
   bajarRespaldo,subirRespaldo,borrarTodo,cargarDemo,num,
-  entrarGoogle,salir,abrirPermisos,aprobarSolicitud,cambiarRolUsuario,quitarUsuario});
+  entrarGoogle,salir,abrirPermisos,agregarPorCorreo,_selRol,listarUsuarios,cambiarRolUsuario,darBaja,quitarUsuario});
 boot();
 </script>
 </body>
