@@ -744,8 +744,9 @@ function pintarProd(){
      '<div style="flex:1"><label>Foto</label><input type="file" accept="image/*" capture="environment" onchange="fotoProd(this)">'+
      (p.foto?'<button class="linkbtn del" onclick="editProd.foto=\'\';pintarProd()">quitar foto</button>':'')+'</div></div>';
   h+='<div class="field"><label>Nombre</label><input id="pr_nom" value="'+esc(p.nombre)+'" placeholder="Ej: Gel efecto calor 50ml"></div>';
-  h+='<div class="field"><label>Categoría</label><select id="pr_cat">'+
-     S.categorias.map(c=>'<option'+(c===p.cat?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select></div>';
+  h+='<div class="field"><label>Categoría</label><select id="pr_cat" onchange="catSelChange(this)">'+
+     S.categorias.map(c=>'<option'+(c===p.cat?' selected':'')+'>'+esc(c)+'</option>').join('')+
+     '<option value="__nueva__">➕ Nueva categoría…</option></select></div>';
   h+='<div class="row2"><div class="field"><label>Precio de compra</label><input id="pr_costo" inputmode="numeric" value="'+(p.costo||'')+'" placeholder="0" oninput="previewMargen()"></div>'+
      '<div class="field"><label>Precio de venta</label><input id="pr_precio" inputmode="numeric" value="'+(p.precio||'')+'" placeholder="0" oninput="previewMargen()"></div></div>';
   h+='<div id="pr_marg" class="card pad" style="background:var(--brand-soft);border-color:var(--brand);padding:11px 13px;margin-bottom:12px">'+textoMargen(p.costo,p.precio)+'</div>';
@@ -811,6 +812,15 @@ function comprimir(file,max,cb){
     img.src=r.result;
   };
   r.readAsDataURL(file);
+}
+function catSelChange(sel){
+  if(sel.value!=='__nueva__'){ editProd.cat=sel.value; return; }
+  var prev=editProd.cat;
+  leerProdForm();                 /* conserva nombre/precio/stock ya escritos */
+  var v=(prompt('Nombre de la nueva categoría:')||'').trim();
+  if(v && !S.categorias.includes(v)){ S.categorias.push(v); save(); }
+  editProd.cat = v || prev || (S.categorias[0]||'General');
+  pintarProd();
 }
 function leerProdForm(){
   if(!$('pr_nom'))return;
@@ -1222,7 +1232,7 @@ function boot(){
   if(window.firebase && firebase.initializeApp){ iniciarFirebase(); }
   else { gateError('No cargó Firebase (revisá tu conexión).'); }
 }
-Object.assign(window,{irA,cambiarMes,mesHoy,abrirProd,pintarProd,guardarProd,borrarProd,previewMargen,agregarVariante,fotoProd,
+Object.assign(window,{irA,cambiarMes,mesHoy,abrirProd,pintarProd,guardarProd,borrarProd,previewMargen,agregarVariante,catSelChange,fotoProd,
   abrirPed,pintarPed,guardarPed,borrarPed,abrirElegirProd,elegirProd,filtrarElegir,cambiarCant,actualizarTotPed,
   copiarResumenPedido,copiarCatalogo,cerrarModal,toggleDiscreto,guardarAjustes,agregarCat,borrarCat,subirLogo,
   bajarRespaldo,subirRespaldo,borrarTodo,cargarDemo,num,
