@@ -271,6 +271,7 @@ body.cargando .shell, body.cargando .botnav{visibility:hidden}
       <button data-nav="productos" onclick="irA('productos')"><i>▣</i><span>Productos</span></button>
       <button data-nav="pedidos" onclick="irA('pedidos')"><i>❯</i><span>Pedidos</span></button>
       <button data-nav="catalogo" onclick="irA('catalogo')"><i>✦</i><span>Catálogo</span></button>
+      <button data-nav="web" onclick="irA('web')"><i>❖</i><span>Vitrina web</span></button>
       <button data-nav="ajustes" onclick="irA('ajustes')"><i>⚙</i><span>Ajustes</span></button>
     </div>
     <div class="foot">
@@ -299,6 +300,7 @@ body.cargando .shell, body.cargando .botnav{visibility:hidden}
   <button data-nav="productos" onclick="irA('productos')"><i>📦</i>Productos</button>
   <button data-nav="pedidos" onclick="irA('pedidos')"><i>🧾</i>Pedidos</button>
   <button data-nav="catalogo" onclick="irA('catalogo')"><i>✨</i>Catálogo</button>
+  <button data-nav="web" onclick="irA('web')"><i>🌐</i>Vitrina</button>
   <button data-nav="ajustes" onclick="irA('ajustes')"><i>⚙️</i>Ajustes</button>
 </nav>
 
@@ -467,7 +469,7 @@ function render(){
   document.body.classList.toggle('has-logo', !!S.tienda.logo);
   const logoHTML = S.tienda.logo ? '<img src="'+esc(S.tienda.logo)+'" alt="">' : '';
   document.querySelectorAll('.js-hLogo').forEach(e=>e.innerHTML=logoHTML);
-  const m={resumen:vResumen,productos:vProductos,pedidos:vPedidos,catalogo:vCatalogo,ajustes:vAjustes};
+  const m={resumen:vResumen,productos:vProductos,pedidos:vPedidos,catalogo:vCatalogo,web:vWeb,ajustes:vAjustes};
   $('app').innerHTML=(m[vista]||vResumen)();
 }
 
@@ -647,15 +649,6 @@ function vAjustes(){
     '<div class="field"><label>Avisar para reponer cuando queden</label><input id="aj_min" inputmode="numeric" value="'+(S.ajustes.minimoDefault)+'"></div>'+
     '<button class="btn btn-brand" onclick="guardarAjustes()">Guardar</button></div>';
 
-  if(rol==='super'||rol==='admin'){
-    h+='<div class="sectit">Página web</div><div class="card pad">'+
-      '<div class="hint" style="margin-bottom:10px">Tu vidriera pública. Editá el carrusel y los textos, y publicá cuando quieras que la web se actualice con tus productos, precios y fotos de ahora. Los productos sin stock no aparecen.</div>'+
-      '<button class="btn btn-ghost" style="margin-bottom:8px" onclick="abrirVidriera()">✏️ Editar vidriera (carrusel y textos)</button>'+
-      '<button class="btn btn-brand" onclick="publicarWeb()">🌐 Publicar a la web</button>'+
-      ((S.web&&S.web.ultimaPublicacion)?'<div class="hint" style="margin-top:8px">Última vez publicado: '+esc(S.web.ultimaPublicacion)+'</div>':'')+
-      '</div>';
-  }
-
   h+='<div class="sectit">Categorías <span class="cnt">'+S.categorias.length+'</span></div><div class="card pad">'+
     '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">'+
     S.categorias.map((c,i)=>'<span class="chip c-gold" style="padding:5px 10px">'+esc(c)+
@@ -737,43 +730,63 @@ function borrarTodo(){
   S=estadoInicial();save();render();toast('Todo borrado');
 }
 
-/* --------------------- VIDRIERA / WEB PÚBLICA --------------------- */
+/* --------------------- VITRINA / WEB PÚBLICA --------------------- */
 /* La web pública NO lee la base de gestión (ahí están costos y pedidos).
    "Publicar" arma una copia con solo lo que la clienta puede ver y la
-   escribe en el nodo /web, que es de lectura pública. */
-function abrirVidriera(){
-  const w=S.web||(S.web={hero:{tagline:'',texto:''},carrusel:[]});
-  if(!w.hero)w.hero={tagline:'',texto:''}; if(!w.carrusel)w.carrusel=[];
-  let h='<h3>Vidriera de la web</h3>';
-  h+='<div class="field"><label>Frase principal</label><input id="wb_tag" value="'+esc(w.hero.tagline||'')+'" placeholder="Placer con clase."></div>';
-  h+='<div class="field"><label>Texto bajo la frase</label><input id="wb_txt" value="'+esc(w.hero.texto||'')+'"></div>';
-  h+='<label>Carrusel (arriba de todo en la web)</label><div class="card" style="margin-bottom:10px">';
-  if(!w.carrusel.length)h+='<div class="hint" style="padding:6px 2px">Todavía sin slides. Agregá el primero abajo.</div>';
-  h+=w.carrusel.map((s,i)=>'<div style="border-bottom:1px solid var(--line);padding:10px 2px;display:flex;flex-direction:column;gap:6px">'+
-     '<input placeholder="Título (ej: Lencería de noche)" value="'+esc(s.titulo||'')+'" oninput="S.web.carrusel['+i+'].titulo=this.value">'+
-     '<input placeholder="Texto corto" value="'+esc(s.texto||'')+'" oninput="S.web.carrusel['+i+'].texto=this.value">'+
+   escribe en el nodo /web, que es de lectura pública. Todo lo de la web
+   vive en su propia pantalla (Vitrina), separado de Ajustes. */
+const WEB_URL='https://orbepy.com/temptress/web.html';
+function webAsegurar(){ if(!S.web)S.web={hero:{tagline:'',texto:''},carrusel:[]}; if(!S.web.hero)S.web.hero={tagline:'',texto:''}; if(!S.web.carrusel)S.web.carrusel=[]; return S.web; }
+function vWeb(){
+  const w=webAsegurar();
+  const destN=S.productos.filter(p=>p.destacado&&stockDe(p)>0).length;
+  let h='';
+  /* Publicar */
+  h+='<div class="sectit">Publicar</div><div class="card pad">'+
+     '<div class="hint" style="margin-bottom:10px">Cuando termines de editar, tocá publicar y la web se actualiza con tus productos, precios y fotos de ahora. Los que no tienen stock no aparecen.</div>'+
+     '<button class="btn btn-brand" onclick="publicarWeb()">🌐 Publicar a la web</button>'+
+     '<a class="btn btn-ghost" style="margin-top:8px" href="'+WEB_URL+'" target="_blank" rel="noopener">👁 Ver la web</a>'+
+     (w.ultimaPublicacion?'<div class="hint" style="margin-top:8px">Última vez publicado: '+esc(w.ultimaPublicacion)+'</div>':'')+
+     '</div>';
+  /* Destacados (informativo) */
+  h+='<div class="sectit">Piezas destacadas <span class="cnt">'+destN+'</span></div><div class="card pad">'+
+     '<div class="hint">Son las que salen en “Las piezas más codiciadas”. Para poner o sacar una pieza, entrá a <b>Productos</b>, abrí el producto y activá la ⭐.</div></div>';
+  /* Portada (hero) */
+  h+='<div class="sectit">Portada</div><div class="card pad">'+
+     '<div class="field"><label>Frase principal</label><input id="wb_tag" value="'+esc(w.hero.tagline||'')+'" placeholder="Placer con clase." oninput="S.web.hero.tagline=this.value"></div>'+
+     '<div class="field"><label>Texto bajo la frase</label><input id="wb_txt" value="'+esc(w.hero.texto||'')+'" oninput="S.web.hero.texto=this.value"></div>'+
+     '<button class="btn btn-brand" onclick="guardarHero()">Guardar portada</button></div>';
+  /* Carrusel */
+  h+='<div class="sectit">Carrusel <span class="cnt">'+w.carrusel.length+'</span></div><div class="card pad">'+
+     '<div class="hint" style="margin-bottom:10px">Los slides que se ven arriba de todo. Ponele una imagen de fondo a cada uno y elegí a qué colección lleva.</div>';
+  if(!w.carrusel.length)h+='<div class="hint" style="margin-bottom:10px">Todavía sin slides. Agregá el primero abajo.</div>';
+  h+=w.carrusel.map((s,i)=>'<div style="border:1px solid var(--line-s);border-radius:12px;padding:11px;margin-bottom:10px;display:flex;flex-direction:column;gap:7px">'+
+     '<div style="display:flex;gap:10px;align-items:flex-start">'+
+       '<div class="thumb" style="width:60px;height:60px;flex:none;font-size:22px">'+(s.foto?'<img src="'+esc(s.foto)+'">':'🖼️')+'</div>'+
+       '<div style="flex:1;display:flex;flex-direction:column;gap:6px">'+
+         '<input placeholder="Título (ej: Lencería de noche)" value="'+esc(s.titulo||'')+'" oninput="S.web.carrusel['+i+'].titulo=this.value">'+
+         '<input placeholder="Texto corto" value="'+esc(s.texto||'')+'" oninput="S.web.carrusel['+i+'].texto=this.value">'+
+       '</div>'+
+     '</div>'+
      '<select onchange="S.web.carrusel['+i+'].cat=this.value">'+
        '<option value="">— A qué colección lleva el botón —</option>'+
        S.categorias.map(c=>'<option'+(c===s.cat?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select>'+
      '<div style="display:flex;gap:8px;align-items:center">'+
-       (s.foto?'<div class="thumb" style="width:44px;height:44px"><img src="'+esc(s.foto)+'"></div>':'')+
-       '<input type="file" accept="image/*" onchange="fotoSlide(this,'+i+')" style="flex:1">'+
-       '<button class="linkbtn del" onclick="S.web.carrusel.splice('+i+',1);save();abrirVidriera()">Quitar</button></div>'+
+       '<label class="btn btn-ghost" style="flex:1;margin:0;cursor:pointer">'+(s.foto?'Cambiar imagen':'📷 Elegir imagen')+'<input type="file" accept="image/*" style="display:none" onchange="fotoSlide(this,'+i+')"></label>'+
+       '<button class="btn btn-danger" style="width:auto;padding:11px 14px" onclick="quitarSlide('+i+')">Quitar</button>'+
+     '</div>'+
      '</div>').join('');
-  h+='</div><button class="btn btn-ghost" onclick="S.web.carrusel.push({titulo:\'\',texto:\'\',cat:\'\',foto:\'\'});save();abrirVidriera()">+ Agregar slide</button>';
-  h+='<button class="btn btn-brand" style="margin-top:10px" onclick="guardarVidriera()">Guardar vidriera</button>';
-  h+='<button class="btn btn-ghost" style="margin-top:8px" onclick="cerrarModal()">Cerrar</button>';
-  sheet(h);
+  h+='<button class="btn btn-ghost" onclick="agregarSlide()">+ Agregar slide</button>'+
+     '<button class="btn btn-brand" style="margin-top:10px" onclick="guardarHero()">Guardar cambios</button></div>';
+  h+='<div class="hint" style="text-align:center;padding:12px 0 4px">Los cambios se guardan en tu equipo y en la nube. Para que se vean en la web pública, tocá <b>Publicar</b>.</div>';
+  return h;
 }
+function guardarHero(){ webAsegurar(); if($('wb_tag'))S.web.hero.tagline=$('wb_tag').value.trim(); if($('wb_txt'))S.web.hero.texto=$('wb_txt').value.trim(); save(); toast('Guardado ✓'); }
+function agregarSlide(){ webAsegurar(); S.web.carrusel.push({titulo:'',texto:'',cat:'',foto:''}); save(); render(); }
+function quitarSlide(i){ webAsegurar(); S.web.carrusel.splice(i,1); save(); render(); }
 function fotoSlide(inp,i){
   const f=inp.files&&inp.files[0];if(!f)return;
-  comprimir(f,1000,d=>{S.web.carrusel[i].foto=d;save();abrirVidriera();});
-}
-function guardarVidriera(){
-  if(!S.web)S.web={hero:{},carrusel:[]};
-  if($('wb_tag'))S.web.hero.tagline=$('wb_tag').value.trim();
-  if($('wb_txt'))S.web.hero.texto=$('wb_txt').value.trim();
-  save();cerrarModal();toast('Vidriera guardada ✓');
+  comprimir(f,1000,d=>{ webAsegurar(); S.web.carrusel[i].foto=d; save(); render(); });
 }
 function publicarWeb(){
   if(!_fbReady||!rol){toast('Necesitás estar conectado para publicar');return;}
