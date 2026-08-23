@@ -917,8 +917,17 @@ function comprimir(file,max,cb){
       if(w>h&&w>max){h=Math.round(h*max/w);w=max;}
       else if(h>max){w=Math.round(w*max/h);h=max;}
       const c=document.createElement('canvas');c.width=w;c.height=h;
-      c.getContext('2d').drawImage(img,0,0,w,h);
-      cb(c.toDataURL('image/jpeg',.72));
+      const ctx=c.getContext('2d');
+      ctx.drawImage(img,0,0,w,h);
+      /* Si la imagen tiene transparencia (PNG recortado, sin fondo) la guardamos
+         como PNG para no perder el recorte. Si es opaca (una foto normal) va como
+         JPEG, que pesa mucho menos. Antes todo iba a JPEG y el fondo transparente
+         terminaba en NEGRO. */
+      let transp=false;
+      try{ const d=ctx.getImageData(0,0,w,h).data;
+        for(let i=3;i<d.length;i+=28){ if(d[i]<250){ transp=true; break; } }
+      }catch(e){}
+      cb(transp ? c.toDataURL('image/png') : c.toDataURL('image/jpeg',.72));
     };
     img.onerror=()=>toast('No se pudo leer la imagen');
     img.src=r.result;
