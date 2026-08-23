@@ -319,8 +319,8 @@
   .hue4{filter:hue-rotate(-8deg) brightness(.92)}
   .hue5{filter:hue-rotate(22deg) saturate(.9)}
   .prod{cursor:pointer}
-  .prod .ph .multi{position:absolute;z-index:3;top:12px;right:12px;display:inline-flex;align-items:center;gap:4px;
-    background:rgba(11,4,6,.7);border:1px solid var(--linea);color:var(--marfil);font-size:.72rem;padding:.25em .55em;border-radius:999px}
+  .prod .ph .pi{opacity:0;transition:opacity .5s ease}
+  .prod .ph .pi.on{opacity:1}
   .prod-detalle{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:start}
   @media (max-width:760px){.prod-detalle{grid-template-columns:1fr;gap:22px}}
   .gal{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--linea);isolation:isolate}
@@ -761,12 +761,12 @@
   function fotosDe(p){ return (p.fotos&&p.fotos.length)?p.fotos:(p.foto?[p.foto]:[]); }
   function prodCard(p){
     var fs=fotosDe(p);
-    var ph = fs.length ? '<img src="'+esc(fs[0])+'" alt="'+esc(p.nombre)+'">'
-                       : '<div class="satin '+catHue(p.cat)+'"></div><span class="mk">T</span>';
+    var ph = fs.length
+      ? fs.map(function(src,idx){ return '<img class="pi'+(idx===0?' on':'')+'" src="'+esc(src)+'" alt="'+esc(p.nombre)+'">'; }).join('')
+      : '<div class="satin '+catHue(p.cat)+'"></div><span class="mk">T</span>';
     var tag = p.etiqueta ? '<span class="tag">'+esc(p.etiqueta)+'</span>' : '';
-    var multi = fs.length>1 ? '<span class="multi"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="13" height="13" rx="2"/><path d="M8 20h11a1 1 0 001-1V9"/></svg>'+fs.length+'</span>' : '';
-    return '<article class="prod" data-prod="'+esc(p.id)+'">'+
-      '<div class="ph">'+ph+tag+multi+'</div>'+
+    return '<article class="prod'+(fs.length>1?' multi':'')+'" data-prod="'+esc(p.id)+'">'+
+      '<div class="ph">'+ph+tag+'</div>'+
       '<div class="body">'+
         '<span class="cat-mini">'+esc(p.cat)+'</span>'+
         '<h4>'+esc(p.nombre)+'</h4>'+
@@ -920,6 +920,28 @@
   }
 
   /* ---------- click delegado ---------- */
+  /* ---------- hover: cambiar fotos del producto al pasar el mouse ---------- */
+  var _hCard=null, _hTimer=null;
+  function _hStop(){
+    if(_hTimer){ clearInterval(_hTimer); _hTimer=null; }
+    if(_hCard){ var im=_hCard.querySelectorAll('.pi'); for(var i=0;i<im.length;i++){ im[i].classList.toggle('on', i===0); } }
+    _hCard=null;
+  }
+  document.addEventListener('mouseover',function(e){
+    var card=e.target.closest('.prod.multi'); if(!card || card===_hCard) return;
+    _hStop(); _hCard=card;
+    var im=card.querySelectorAll('.pi'); if(im.length<2) return;
+    var idx=0;
+    _hTimer=setInterval(function(){
+      im[idx].classList.remove('on');
+      idx=(idx+1)%im.length;
+      im[idx].classList.add('on');
+    },900);
+  });
+  document.addEventListener('mouseout',function(e){
+    if(_hCard && !_hCard.contains(e.relatedTarget)) _hStop();
+  });
+
   document.addEventListener('click',function(e){
     if(e.target.closest('a[href^="http"]')) return;   /* links reales (WhatsApp, IG) van solos */
     var dp=e.target.closest('[data-prod]');
