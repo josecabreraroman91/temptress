@@ -533,6 +533,7 @@ function filaProd(p,compacto){
     '<div class="pinfo"><div class="pname disc-hide">'+esc(p.nombre)+'</div>'+
     '<div class="pmeta"><span class="chip '+cls+'">'+txt+'</span> '+
       (compacto?'':esc(p.cat||'General')+(marg?' · margen '+pctM+'%':''))+'</div></div>'+
+    '<button class="linkbtn" onclick="event.stopPropagation();toggleDestacado(\''+p.id+'\')" title="'+(p.destacado?'Quitar de destacados de la web':'Destacar en la web')+'" style="font-size:19px;padding:0 8px;'+(p.destacado?'':'opacity:.45')+'">'+(p.destacado?'⭐':'☆')+'</button>'+
     '<div class="pright"><div class="pprice num">'+gsCorto(p.precio)+'</div>'+
     '<div class="pmeta">'+(compacto?'costo '+gsCorto(p.costo):'gana '+gsCorto(marg))+'</div></div></div>';
 }
@@ -862,9 +863,7 @@ function pintarProd(){
        '<button class="btn btn-ghost" onclick="editProd.variantes=[];pintarProd()">Sin variantes</button></div>';
   }
   h+='<div class="field"><label>Página web</label>'+
-     '<label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:6px 0">'+
-     '<input type="checkbox" id="pr_dest" '+(p.destacado?'checked':'')+' style="width:18px;height:18px;accent-color:var(--brand)">'+
-     '<span>⭐ Destacar en la home de la web</span></label>'+
+     '<button type="button" id="pr_dest" data-on="'+(p.destacado?'1':'0')+'" onclick="toggleDestBtn(this)" class="btn '+(p.destacado?'btn-brand':'btn-ghost')+'" style="justify-content:center;margin-bottom:8px">'+(p.destacado?'⭐ Destacada en la web · tocá para sacar':'☆ Destacar en la web')+'</button>'+
      '<input id="pr_etq" value="'+esc(p.etiqueta||'')+'" placeholder="Etiqueta opcional: Nuevo, Más vendido…"></div>';
   h+='<button class="btn btn-brand" onclick="guardarProd()">'+(esNuevo?'Guardar producto':'Guardar cambios')+'</button>';
   if(!esNuevo)h+='<button class="btn btn-danger" style="margin-top:8px" onclick="borrarProd()">Borrar producto</button>';
@@ -943,8 +942,22 @@ function leerProdForm(){
   editProd.precio=num($('pr_precio').value);
   if($('pr_stock'))editProd.stock=num($('pr_stock').value);
   if($('pr_min'))editProd.minimo=$('pr_min').value.trim()===''?null:num($('pr_min').value);
-  if($('pr_dest'))editProd.destacado=$('pr_dest').checked;
+  if($('pr_dest'))editProd.destacado=$('pr_dest').dataset.on==='1';
   if($('pr_etq'))editProd.etiqueta=$('pr_etq').value.trim();
+}
+/* Marcar/desmarcar destacado desde la lista, sin abrir el producto. */
+function toggleDestacado(id){
+  const p=prod(id); if(!p)return;
+  p.destacado=!p.destacado;
+  save(); render();
+  toast(p.destacado?'Destacada en la web ⭐':'Sacada de destacados');
+}
+/* Toggle del botón dentro del editor de producto. */
+function toggleDestBtn(btn){
+  const on=btn.dataset.on!=='1'; btn.dataset.on=on?'1':'0';
+  btn.className='btn '+(on?'btn-brand':'btn-ghost'); btn.style.justifyContent='center'; btn.style.marginBottom='8px';
+  btn.textContent=on?'⭐ Destacada en la web · tocá para sacar':'☆ Destacar en la web';
+  if(typeof editProd==='object'&&editProd)editProd.destacado=on;
 }
 function guardarProd(){
   leerProdForm();
