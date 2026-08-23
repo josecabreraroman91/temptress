@@ -790,10 +790,11 @@ function fotoSlide(inp,i){
 }
 function publicarWeb(){
   if(!_fbReady||!rol){toast('Necesitás estar conectado para publicar');return;}
-  const productos=S.productos.filter(p=>stockDe(p)>0).map(p=>({
-    id:p.id, nombre:p.nombre, cat:p.cat||'General', precio:Number(p.precio)||0,
-    foto:p.foto||'', destacado:!!p.destacado, etiqueta:p.etiqueta||''
-  }));
+  const productos=S.productos.filter(p=>stockDe(p)>0).map(p=>{
+    const fs=(p.fotos&&p.fotos.length)?p.fotos:(p.foto?[p.foto]:[]);
+    return { id:p.id, nombre:p.nombre, cat:p.cat||'General', precio:Number(p.precio)||0,
+      foto:fs[0]||'', fotos:fs, destacado:!!p.destacado, etiqueta:p.etiqueta||'' };
+  });
   if(!productos.length && !confirm('No hay productos con stock para mostrar. ¿Publicar igual (la web quedaría sin productos)?'))return;
   const conStock={}; productos.forEach(p=>conStock[p.cat]=true);
   const categorias=S.categorias.filter(c=>conStock[c]);   /* solo categorías que tienen algo en stock */
@@ -820,7 +821,7 @@ function sheet(inner){
   document.body.style.overflow='hidden';
 }
 function abrirProd(id){
-  editProd=id?JSON.parse(JSON.stringify(prod(id))):{id:null,nombre:'',cat:S.categorias[0]||'General',foto:'',stock:0,costo:0,precio:0,minimo:null,destacado:false,etiqueta:'',variantes:[]};
+  editProd=id?JSON.parse(JSON.stringify(prod(id))):{id:null,nombre:'',cat:S.categorias[0]||'General',foto:'',fotos:[],stock:0,costo:0,precio:0,minimo:null,destacado:false,etiqueta:'',variantes:[]};
   pintarProd();
 }
 function pintarProd(){
@@ -828,10 +829,17 @@ function pintarProd(){
   const marg=(Number(p.precio)||0)-(Number(p.costo)||0);
   const pct=p.precio>0?Math.round(marg/p.precio*100):0;
   let h='<h3>'+(esNuevo?'Nuevo producto':'Editar producto')+'</h3>';
-  h+='<div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">'+
-     '<div class="thumb" style="width:70px;height:70px;font-size:26px">'+(p.foto?'<img src="'+esc(p.foto)+'">':'📦')+'</div>'+
-     '<div style="flex:1"><label>Foto</label><input type="file" accept="image/*" onchange="fotoProd(this)">'+
-     (p.foto?'<button class="linkbtn del" onclick="editProd.foto=\'\';pintarProd()">quitar foto</button>':'')+'</div></div>';
+  const _fotos=(p.fotos&&p.fotos.length)?p.fotos:(p.foto?[p.foto]:[]); p.fotos=_fotos;
+  h+='<label>Fotos</label>';
+  h+='<div class="hint" style="margin:2px 0 8px">La primera es la principal. Podés subir varias — en la web, al abrir el producto, se ven pasando una por una.</div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">'+
+     _fotos.map((src,i)=>'<div style="position:relative;width:72px;height:72px">'+
+       '<div class="thumb" style="width:72px;height:72px"><img src="'+esc(src)+'"></div>'+
+       (i===0?'<span style="position:absolute;left:3px;bottom:3px;background:var(--brand);color:#fff;font-size:9px;padding:1px 6px;border-radius:6px">Principal</span>':'')+
+       '<button class="linkbtn del" style="position:absolute;top:-7px;right:-7px;width:22px;height:22px;padding:0;background:var(--card2);border:1px solid var(--line-s);border-radius:50%;line-height:20px;text-align:center" onclick="quitarFotoProd('+i+')">✕</button>'+
+     '</div>').join('')+
+     '<label class="thumb" style="width:72px;height:72px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:30px;color:var(--muted);border:1px dashed var(--line-s)">+<input type="file" accept="image/*" multiple style="display:none" onchange="fotoProd(this)"></label>'+
+     '</div>';
   h+='<div class="field"><label>Nombre</label><input id="pr_nom" value="'+esc(p.nombre)+'" placeholder="Ej: Gel efecto calor 50ml"></div>';
   h+='<div class="field"><label>Categoría</label><select id="pr_cat" onchange="catSelChange(this)">'+
      S.categorias.map(c=>'<option'+(c===p.cat?' selected':'')+'>'+esc(c)+'</option>').join('')+
@@ -884,9 +892,20 @@ function agregarVariante(){
   pintarProd();
 }
 function fotoProd(inp){
-  const f=inp.files&&inp.files[0];if(!f)return;
+  const files=Array.prototype.slice.call(inp.files||[]); if(!files.length)return;
   leerProdForm();
-  comprimir(f,600,d=>{editProd.foto=d;pintarProd();});
+  editProd.fotos=(editProd.fotos&&editProd.fotos.length)?editProd.fotos:(editProd.foto?[editProd.foto]:[]);
+  (function next(){
+    if(!files.length){ editProd.foto=editProd.fotos[0]||''; pintarProd(); return; }
+    comprimir(files.shift(),900,d=>{ editProd.fotos.push(d); next(); });
+  })();
+}
+function quitarFotoProd(i){
+  leerProdForm();
+  editProd.fotos=editProd.fotos||[];
+  editProd.fotos.splice(i,1);
+  editProd.foto=editProd.fotos[0]||'';
+  pintarProd();
 }
 /* Las fotos se guardan achicadas: si no, el almacenamiento del navegador
    se llena con 15 productos. 600px de lado y calidad 0.72 alcanza de sobra. */

@@ -306,6 +306,26 @@
   .hue3{filter:hue-rotate(14deg) brightness(1.06)}
   .hue4{filter:hue-rotate(-8deg) brightness(.92)}
   .hue5{filter:hue-rotate(22deg) saturate(.9)}
+  .prod{cursor:pointer}
+  .prod .ph .multi{position:absolute;z-index:3;top:12px;right:12px;display:inline-flex;align-items:center;gap:4px;
+    background:rgba(11,4,6,.7);border:1px solid var(--linea);color:var(--marfil);font-size:.72rem;padding:.25em .55em;border-radius:999px}
+  .prod-detalle{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:start}
+  @media (max-width:760px){.prod-detalle{grid-template-columns:1fr;gap:22px}}
+  .gal{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--linea);isolation:isolate}
+  .g-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none}
+  .g-track::-webkit-scrollbar{display:none}
+  .g-slide{position:relative;flex:0 0 100%;scroll-snap-align:center;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center}
+  .g-slide img{width:100%;height:100%;object-fit:cover}
+  .g-slide .satin{position:absolute;inset:0}
+  .g-mk{position:relative;z-index:2;font-family:var(--script);font-size:4rem;color:rgba(255,224,166,.35)}
+  .g-arw{position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:42px;height:42px;border-radius:999px;
+    background:rgba(11,4,6,.5);border:1px solid var(--linea);color:var(--marfil);cursor:pointer;display:grid;place-items:center;backdrop-filter:blur(6px)}
+  .g-arw:hover{border-color:var(--oro);color:var(--oro)}
+  .g-prev{left:12px}.g-next{right:12px}
+  .g-dots{position:absolute;left:0;right:0;bottom:12px;z-index:4;display:flex;gap:7px;justify-content:center}
+  .g-dots button{width:8px;height:8px;border-radius:999px;border:0;background:rgba(255,255,255,.4);cursor:pointer;padding:0;transition:width .3s ease,background .3s ease}
+  .g-dots button.on{width:22px;background:var(--oro)}
+  .prod-info .btn-wa{width:100%;justify-content:center}
 
   /* ---- Banda discreción ---- */
   .discret{position:relative;overflow:hidden;border-top:1px solid var(--linea);border-bottom:1px solid var(--linea)}
@@ -647,6 +667,13 @@
   </section>
 </main>
 
+<!-- ================= PÁGINA DE PRODUCTO ================= -->
+<main id="producto" hidden>
+  <section class="blk">
+    <div class="wrap" id="prodBody"></div>
+  </section>
+</main>
+
 <!-- ================= FOOTER ================= -->
 <footer>
   <div class="wrap">
@@ -716,17 +743,20 @@
   function hue(i){return 'hue'+((i%5)+1);}
   function catHue(cat){var i=DATA.categorias.indexOf(cat); return hue(i<0?0:i);}
 
+  function fotosDe(p){ return (p.fotos&&p.fotos.length)?p.fotos:(p.foto?[p.foto]:[]); }
   function prodCard(p){
-    var ph = p.foto ? '<img src="'+esc(p.foto)+'" alt="'+esc(p.nombre)+'">'
-                    : '<div class="satin '+catHue(p.cat)+'"></div><span class="mk">T</span>';
+    var fs=fotosDe(p);
+    var ph = fs.length ? '<img src="'+esc(fs[0])+'" alt="'+esc(p.nombre)+'">'
+                       : '<div class="satin '+catHue(p.cat)+'"></div><span class="mk">T</span>';
     var tag = p.etiqueta ? '<span class="tag">'+esc(p.etiqueta)+'</span>' : '';
-    return '<article class="prod">'+
-      '<div class="ph">'+ph+tag+'</div>'+
+    var multi = fs.length>1 ? '<span class="multi"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="13" height="13" rx="2"/><path d="M8 20h11a1 1 0 001-1V9"/></svg>'+fs.length+'</span>' : '';
+    return '<article class="prod" data-prod="'+esc(p.id)+'">'+
+      '<div class="ph">'+ph+tag+multi+'</div>'+
       '<div class="body">'+
         '<span class="cat-mini">'+esc(p.cat)+'</span>'+
         '<h4>'+esc(p.nombre)+'</h4>'+
         '<div class="row"><span class="price">'+gs(p.precio)+'</span>'+
-        '<a class="mini-wa" href="'+WA+'">Consultar</a></div>'+
+        '<span class="mini-wa">Ver →</span></div>'+
       '</div></article>';
   }
 
@@ -762,6 +792,12 @@
   }
 
   /* ---------- navegación entre "páginas" ---------- */
+  var _prodVolver=null;
+  function ocultarVistas(){
+    document.getElementById('home').hidden=true;
+    document.getElementById('coleccion').hidden=true;
+    var pr=document.getElementById('producto'); if(pr)pr.hidden=true;
+  }
   function verColeccion(cat){
     var items=DATA.productos.filter(function(p){return p.cat===cat && enStock(p);});
     document.getElementById('colTitulo').innerHTML=esc(cat);
@@ -770,15 +806,61 @@
     document.getElementById('colGrid').innerHTML = items.length
       ? items.map(prodCard).join('')
       : '<div class="col-empty">Pronto sumamos piezas a esta colección.<br>Escribinos por WhatsApp y te avisamos.</div>';
-    document.getElementById('home').hidden=true;
-    document.getElementById('coleccion').hidden=false;
+    _prodVolver=function(){ verColeccion(cat); };
+    ocultarVistas(); document.getElementById('coleccion').hidden=false;
     window.scrollTo(0,0);
   }
   function verHome(){
-    document.getElementById('coleccion').hidden=true;
-    document.getElementById('home').hidden=false;
+    ocultarVistas(); document.getElementById('home').hidden=false;
   }
-  window.verColeccion=verColeccion; window.verHome=verHome;
+  function verProducto(id){
+    var p=null,i;
+    for(i=0;i<DATA.productos.length;i++){ if(String(DATA.productos[i].id)===String(id)){ p=DATA.productos[i]; break; } }
+    if(!p){ verHome(); return; }
+    var fs=fotosDe(p);
+    var slides = fs.length
+      ? fs.map(function(src){return '<div class="g-slide"><img src="'+esc(src)+'" alt="'+esc(p.nombre)+'"></div>';}).join('')
+      : '<div class="g-slide"><div class="satin '+catHue(p.cat)+'"></div><span class="g-mk">T</span></div>';
+    var arrows = fs.length>1
+      ? '<button class="g-arw g-prev" onclick="galMove(-1)" aria-label="Anterior"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg></button>'+
+        '<button class="g-arw g-next" onclick="galMove(1)" aria-label="Siguiente"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></button>'
+      : '';
+    var dots = fs.length>1 ? '<div class="g-dots" id="gDots"></div>' : '';
+    var tag = p.etiqueta ? '<span class="tag" style="position:static;display:inline-block;margin-bottom:12px">'+esc(p.etiqueta)+'</span>' : '';
+    var h = '<button class="backlink" onclick="_prodVolver?_prodVolver():verHome()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg>Volver</button>'+
+      '<div class="prod-detalle">'+
+        '<div class="gal"><div class="g-track" id="gTrack">'+slides+'</div>'+arrows+dots+'</div>'+
+        '<div class="prod-info">'+
+          '<span class="eyebrow">'+esc(p.cat)+'</span>'+
+          '<h2 class="section-title" style="margin:.35rem 0 .7rem">'+esc(p.nombre)+'</h2>'+
+          tag+
+          '<div class="price" style="font-size:1.7rem;color:var(--oro);font-weight:700;margin-bottom:1.3rem">'+gs(p.precio)+'</div>'+
+          '<a class="btn btn-wa" href="'+WA+'"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M.06 24l1.68-6.16A11.9 11.9 0 010 11.94C0 5.35 5.35 0 11.94 0a11.9 11.9 0 018.42 3.5 11.9 11.9 0 013.5 8.44c0 6.58-5.35 11.93-11.93 11.93a11.9 11.9 0 01-5.7-1.45L.06 24z"/></svg> Consultar por WhatsApp</a>'+
+          '<p style="color:var(--marfil-2);font-size:.9rem;margin-top:1rem">Escribinos y coordinamos el envío discreto a todo el país.</p>'+
+        '</div>'+
+      '</div>';
+    document.getElementById('prodBody').innerHTML=h;
+    ocultarVistas(); document.getElementById('producto').hidden=false;
+    window.scrollTo(0,0);
+    initGaleria(fs.length||1);
+  }
+  var _gal=0;
+  function initGaleria(n){
+    _gal=0;
+    var track=document.getElementById('gTrack'); if(!track) return;
+    var dotsWrap=document.getElementById('gDots');
+    if(dotsWrap){ dotsWrap.innerHTML=''; for(var i=0;i<n;i++){ (function(idx){var b=document.createElement('button'); if(idx===0)b.className='on'; b.onclick=function(){galGo(idx);}; dotsWrap.appendChild(b);})(i); } }
+    function pintar(){ if(dotsWrap){ for(var k=0;k<n;k++)dotsWrap.children[k].className=(k===_gal?'on':''); } }
+    window.galGo=function(i){ _gal=(i%n+n)%n; var w=track.getBoundingClientRect().width; track.scrollTo({left:w*_gal,behavior:'smooth'}); pintar(); };
+    window.galMove=function(d){ galGo(_gal+d); };
+    var stt; track.addEventListener('scroll',function(){ clearTimeout(stt); stt=setTimeout(function(){ var w=track.getBoundingClientRect().width; var i=Math.round(track.scrollLeft/w); if(i!==_gal){ _gal=i; pintar(); } },100); });
+    var reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches, timer;
+    function play(){ if(reduce||n<2)return; stop(); timer=setInterval(function(){ galGo(_gal+1); },4000); }
+    function stop(){ if(timer)clearInterval(timer); }
+    track.addEventListener('pointerenter',stop); track.addEventListener('pointerleave',play);
+    play();
+  }
+  window.verColeccion=verColeccion; window.verHome=verHome; window.verProducto=verProducto;
 
   /* ---------- Age gate + menú ---------- */
   document.body.classList.add('locked');
@@ -814,6 +896,9 @@
 
   /* ---------- click delegado ---------- */
   document.addEventListener('click',function(e){
+    if(e.target.closest('a[href^="http"]')) return;   /* links reales (WhatsApp, IG) van solos */
+    var dp=e.target.closest('[data-prod]');
+    if(dp){ e.preventDefault(); verProducto(dp.getAttribute('data-prod')); cerrarM(); return; }
     var dc=e.target.closest('[data-cat]');
     if(dc){ e.preventDefault(); verColeccion(dc.getAttribute('data-cat')); cerrarM(); return; }
     var a=e.target.closest('a[href^="#"]');
@@ -849,10 +934,11 @@
   function aplicar(d){
     if(d && (d.productos||d.categorias)){
       DATA.categorias=d.categorias||[];
-      DATA.productos=(d.productos||[]).map(function(p){return {
-        id:p.id, nombre:p.nombre, cat:p.cat, precio:p.precio, foto:p.foto||null,
-        stock:1, destacado:!!p.destacado, etiqueta:p.etiqueta||''
-      };});
+      DATA.productos=(d.productos||[]).map(function(p){
+        var fs=(p.fotos&&p.fotos.length)?p.fotos:(p.foto?[p.foto]:[]);
+        return { id:p.id, nombre:p.nombre, cat:p.cat, precio:p.precio,
+          foto:fs[0]||null, fotos:fs, stock:1, destacado:!!p.destacado, etiqueta:p.etiqueta||'' };
+      });
       DATA.carrusel=(d.carrusel||[]).filter(function(s){return s.titulo||s.foto;}).map(function(s){return {
         eyebrow:s.cat||'Temptress', titulo:s.titulo||'', texto:s.texto||'',
         cta:s.cat?'Ver colección':'Ver más', cat:s.cat||'', foto:s.foto||null
