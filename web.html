@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Temptress · Sex Shop en Asunción. Placer con clase, envíos discretos a todo el Paraguay.">
+<title>Temptress · Sex Shop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Great+Vibes&family=Manrope:wght@300;400;500;600;700&display=swap">
+
+<style>
+  /* ============ TOKENS — mundo oscuro, un solo tema por decisión de marca ============ */
+  :root{
+    --noche:#0B0406;
+    --noche-2:#140609;
+    --vino:#2A060C;
+    --vino-2:#4A0A14;
+    --carmin:#B21E32;
+    --carmin-viva:#D8324A;
+    --oro:#E8C07A;
+    --oro-neon:#FFE0A6;
+    --oro-tenue:rgba(232,192,122,.16);
+    --marfil:#F3E8DD;
+    --marfil-2:rgba(243,232,221,.62);
+    --linea:rgba(232,192,122,.18);
+    --verde-wa:#37c26b;
+
+    --serif:"Fraunces",Georgia,serif;
+    --script:"Great Vibes",cursive;
+    --sans:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+
+    --maxw:1200px;
+    --r:16px;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+  body{
+    background:var(--noche);
+    color:var(--marfil);
+    font-family:var(--sans);
+    font-weight:400;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  ::selection{background:var(--carmin);color:var(--marfil)}
+
+  .wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:clamp(20px,5vw,48px)}
+  .eyebrow{
+    font-family:var(--sans);font-size:.72rem;font-weight:600;
+    letter-spacing:.32em;text-transform:uppercase;color:var(--oro);
+    display:inline-flex;align-items:center;gap:.7em;
+  }
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--oro);opacity:.6}
+  h2.section-title{
+    font-family:var(--serif);font-weight:500;
+    font-size:clamp(1.65rem,3.6vw,2.5rem);line-height:1.06;
+    text-wrap:balance;letter-spacing:-.01em;margin-top:.4rem;
+  }
+  .section-title em{font-style:italic;color:var(--oro)}
+
+  /* ============ SATÉN reutilizable ============ */
+  .satin{
+    position:absolute;inset:0;z-index:0;overflow:hidden;
+    background:
+      radial-gradient(120% 90% at 78% 8%, rgba(216,50,74,.55), transparent 55%),
+      radial-gradient(90% 80% at 12% 90%, rgba(74,10,20,.9), transparent 60%),
+      linear-gradient(155deg, #5c0e1c 0%, #360910 42%, #1a050a 100%);
+  }
+  .satin::before{
+    /* pliegues + brillo que se desplaza */
+    content:"";position:absolute;inset:-30%;
+    background:
+      repeating-linear-gradient(115deg, rgba(255,224,166,.05) 0 2px, transparent 2px 26px),
+      radial-gradient(60% 40% at 30% 30%, rgba(255,255,255,.10), transparent 60%),
+      radial-gradient(50% 40% at 70% 70%, rgba(0,0,0,.35), transparent 60%);
+    mix-blend-mode:screen;
+    animation:seda 14s ease-in-out infinite alternate;
+  }
+  @keyframes seda{
+    0%{transform:translate3d(-3%,-2%,0) scale(1.05) rotate(.5deg)}
+    100%{transform:translate3d(3%,3%,0) scale(1.12) rotate(-.6deg)}
+  }
+  @media (prefers-reduced-motion:reduce){.satin::before{animation:none}}
+
+  /* ============ NEÓN (marca) ============ */
+  .neon{
+    font-family:var(--script);color:var(--oro-neon);line-height:.9;
+    text-shadow:
+      0 0 6px rgba(255,224,166,.9),
+      0 0 18px rgba(255,200,120,.7),
+      0 0 40px rgba(216,50,74,.55),
+      0 0 80px rgba(216,50,74,.35);
+  }
+  .neon.flicker{animation:prende 1.6s steps(1,end) 1 both}
+  @keyframes prende{
+    0%,10%{opacity:.15;filter:brightness(.4)}
+    12%{opacity:.9}
+    14%{opacity:.25}
+    18%{opacity:1}
+    22%{opacity:.5}
+    26%,100%{opacity:1;filter:brightness(1)}
+  }
+  @media (prefers-reduced-motion:reduce){.neon.flicker{animation:none}}
+
+  .lockup{display:flex;flex-direction:column;align-items:center;gap:.1em}
+  .lockup .sub{
+    font-family:var(--serif);font-weight:500;letter-spacing:.5em;
+    text-transform:uppercase;color:var(--marfil);
+    display:inline-flex;align-items:center;gap:.35em;
+    text-shadow:0 1px 10px rgba(0,0,0,.6);
+  }
+  .lockup .sub svg{filter:drop-shadow(0 0 6px rgba(216,50,74,.8))}
+
+  /* ============ BOTONES ============ */
+  .btn{
+    display:inline-flex;align-items:center;gap:.6em;
+    font-family:var(--sans);font-weight:600;font-size:.95rem;letter-spacing:.01em;
+    padding:.95em 1.6em;border-radius:999px;cursor:pointer;border:1px solid transparent;
+    transition:transform .25s ease, box-shadow .25s ease, background .25s ease, color .25s ease;
+  }
+  .btn-oro{background:linear-gradient(180deg,#f0cf8e,#d9ad63);color:#2a0a0f;
+    box-shadow:0 8px 30px rgba(232,192,122,.28)}
+  .btn-oro:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(232,192,122,.42)}
+  .btn-ghost{border-color:var(--linea);color:var(--marfil);background:rgba(255,255,255,.02)}
+  .btn-ghost:hover{border-color:var(--oro);color:var(--oro);transform:translateY(-2px)}
+  .btn-wa{background:var(--verde-wa);color:#04240f;box-shadow:0 8px 26px rgba(55,194,107,.28)}
+  .btn-wa:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(55,194,107,.42)}
+  .btn svg{width:1.15em;height:1.15em}
+
+  /* ============ NAV ============ */
+  header.nav{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter:blur(14px);
+    background:linear-gradient(180deg, rgba(11,4,6,.86), rgba(11,4,6,.5));
+    border-bottom:1px solid var(--linea);
+  }
+  .nav-in{display:flex;align-items:center;justify-content:space-between;gap:1rem;height:70px}
+  .brand-mini{display:flex;align-items:baseline;gap:.5em}
+  .brand-mini .n{font-family:var(--script);font-size:1.9rem;color:var(--oro-neon);
+    text-shadow:0 0 12px rgba(255,200,120,.5);line-height:1}
+  .brand-mini .t{font-family:var(--serif);font-size:.62rem;letter-spacing:.32em;
+    text-transform:uppercase;color:var(--marfil-2)}
+  nav.links{display:flex;gap:2rem}
+  nav.links a{font-size:.9rem;color:var(--marfil-2);font-weight:500;position:relative;padding:.3em 0}
+  nav.links a::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:0;
+    background:var(--oro);transition:width .3s ease}
+  nav.links a:hover{color:var(--marfil)}
+  nav.links a:hover::after{width:100%}
+  .nav-cta{display:flex;align-items:center;gap:.7rem}
+  .nav-wa{padding:.5em 1.05em;font-size:.85rem}
+  .nav-wa svg{width:1.05em;height:1.05em}
+  .burger{display:none;background:none;border:0;color:var(--marfil);cursor:pointer}
+  @media (max-width:860px){
+    nav.links{display:none}
+    .nav-cta .btn-ghost{display:none}
+    .nav-wa{padding:.55em;border-radius:999px}
+    .nav-wa .wa-txt{display:none}
+    .nav-wa svg{width:1.25em;height:1.25em}
+  }
+
+  /* ============ HERO ============ */
+  .hero{position:relative;min-height:clamp(460px,68vh,640px);display:flex;align-items:center;
+    justify-content:center;text-align:center;overflow:hidden;
+    border-bottom:1px solid var(--linea)}
+  .hero .vign{position:absolute;inset:0;z-index:1;
+    background:radial-gradient(120% 100% at 50% 40%, transparent 40%, rgba(6,2,3,.55) 78%, rgba(6,2,3,.95) 100%)}
+  .hero-in{position:relative;z-index:2;padding:4vh 24px;display:flex;flex-direction:column;align-items:center;gap:1.1rem}
+  .hero .lockup .neon{font-size:clamp(3.2rem,10vw,6.2rem)}
+  .hero .lockup .sub{font-size:clamp(.62rem,1.9vw,.92rem)}
+  .hero .tagline{font-family:var(--serif);font-weight:400;font-style:italic;
+    font-size:clamp(1.05rem,2.2vw,1.45rem);color:var(--marfil);max-width:22ch;text-wrap:balance}
+  .hero .support{color:var(--marfil-2);max-width:44ch;font-size:1rem}
+  .hero .cta-row{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-top:.4rem}
+  .plus18{position:absolute;top:22px;right:clamp(20px,5vw,48px);z-index:3;
+    font-size:.7rem;letter-spacing:.2em;color:var(--marfil-2);border:1px solid var(--linea);
+    border-radius:999px;padding:.35em .8em}
+  .scrollcue{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:3;
+    color:var(--marfil-2);font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;
+    display:flex;flex-direction:column;align-items:center;gap:.5em}
+  .scrollcue span{width:1px;height:34px;background:linear-gradient(var(--oro),transparent);animation:baja 2s ease-in-out infinite}
+  @keyframes baja{0%,100%{opacity:.3;transform:scaleY(.6)}50%{opacity:1;transform:scaleY(1)}}
+  @media (prefers-reduced-motion:reduce){.scrollcue span{animation:none}}
+
+  /* ============ TICKER de confianza ============ */
+  .trust{background:var(--noche-2);border-bottom:1px solid var(--linea)}
+  .trust-in{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--linea)}
+  .trust-cell{background:var(--noche-2);padding:.8rem 1rem;display:flex;align-items:center;gap:.75rem}
+  .trust-cell svg{width:20px;height:20px;color:var(--oro);flex:none}
+  .trust-cell b{font-family:var(--sans);font-weight:600;font-size:.85rem;color:var(--marfil);display:block;line-height:1.3}
+  .trust-cell small{color:var(--marfil-2);font-size:.74rem;line-height:1.25}
+  @media (max-width:860px){.trust-in{grid-template-columns:1fr 1fr}.trust-cell{padding:1.1rem 1rem;gap:.7rem}}
+  @media (max-width:480px){.trust-cell small{display:none}.trust-cell svg{width:22px;height:22px}}
+
+  /* ============ CARRUSEL ============ */
+  .carru-sec{padding:clamp(32px,4.5vw,52px) 0 0}
+  .carru{position:relative}
+  .carru-track{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;
+    scrollbar-width:none;-ms-overflow-style:none}
+  .carru-track::-webkit-scrollbar{display:none}
+  .slide{position:relative;flex:0 0 100%;scroll-snap-align:center;isolation:isolate;
+    height:clamp(280px,34vw,400px);border-radius:18px;overflow:hidden;border:1px solid var(--linea);display:flex;align-items:center}
+  .slide .satin{transition:transform 6s ease}
+  .slide .film{position:absolute;inset:0;z-index:1;
+    background:linear-gradient(90deg,rgba(6,2,3,.9) 5%,rgba(6,2,3,.4) 55%,transparent)}
+  .slide .s-in{position:relative;z-index:2;padding:clamp(28px,6vw,64px);max-width:560px;
+    display:flex;flex-direction:column;gap:1.1rem;align-items:flex-start}
+  .slide h3{font-family:var(--serif);font-weight:500;font-size:clamp(2rem,5.2vw,3.4rem);line-height:1.02;text-wrap:balance}
+  .slide h3 em{font-style:italic;color:var(--oro)}
+  .slide p{color:var(--marfil);max-width:34ch;font-size:1.02rem}
+  .slide .price{font-family:var(--sans);font-weight:700;color:var(--oro);font-variant-numeric:tabular-nums;font-size:1.1rem}
+  .carru-btn{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:46px;height:46px;border-radius:999px;
+    background:rgba(11,4,6,.5);border:1px solid var(--linea);color:var(--marfil);cursor:pointer;display:grid;place-items:center;
+    backdrop-filter:blur(6px);transition:background .25s ease,border-color .25s ease,color .25s ease}
+  .carru-btn:hover{border-color:var(--oro);color:var(--oro);background:rgba(11,4,6,.8)}
+  .carru-prev{left:14px}.carru-next{right:14px}
+  .carru-dots{display:flex;gap:8px;justify-content:center;margin-top:18px}
+  .carru-dots button{width:8px;height:8px;border-radius:999px;border:0;background:var(--linea);cursor:pointer;
+    transition:width .3s ease,background .3s ease;padding:0}
+  .carru-dots button.on{width:24px;background:var(--oro)}
+  @media (max-width:600px){.carru-btn{display:none}}
+
+  /* ============ SECCIONES ============ */
+  section.blk{padding:clamp(40px,5.5vw,72px) 0;position:relative}
+  .head-row{display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;margin-bottom:2rem}
+  .head-row p{color:var(--marfil-2);max-width:46ch;margin-top:.8rem}
+  .verlink{font-size:.85rem;color:var(--oro);font-weight:600;letter-spacing:.02em;white-space:nowrap;
+    display:inline-flex;align-items:center;gap:.4em;transition:gap .25s ease}
+  .verlink:hover{gap:.8em}
+  @media (max-width:680px){.head-row{flex-direction:column;align-items:flex-start;margin-bottom:2rem}}
+
+  /* ---- Categorías: mosaico asimétrico ---- */
+  .cats{display:grid;grid-template-columns:repeat(5,1fr);grid-auto-rows:150px;gap:12px}
+  .cat{position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--linea);
+    display:flex;align-items:flex-end;isolation:isolate;cursor:pointer}
+  .cat .satin{transition:transform .8s cubic-bezier(.2,.7,.2,1)}
+  .cat:hover .satin{transform:scale(1.08)}
+  .cat .film{position:absolute;inset:0;z-index:1;
+    background:linear-gradient(180deg,transparent 30%,rgba(6,2,3,.82) 100%)}
+  .cat .mono{position:absolute;top:14px;left:16px;z-index:2;font-family:var(--script);
+    font-size:2rem;color:rgba(255,224,166,.45);text-shadow:0 0 14px rgba(216,50,74,.5)}
+  .cat .lab{position:relative;z-index:2;padding:16px 18px;width:100%}
+  .cat .lab h3{font-family:var(--serif);font-weight:500;font-size:1.2rem}
+  .cat .lab .go{font-size:.8rem;color:var(--oro);letter-spacing:.02em;opacity:0;transform:translateY(6px);
+    transition:opacity .3s ease,transform .3s ease;display:inline-flex;gap:.4em;margin-top:.2em}
+  .cat:hover .lab .go{opacity:1;transform:translateY(0)}
+  .cat.big{grid-column:auto;grid-row:auto}
+  .cat.big .lab h3{font-size:1.2rem}
+  .cat.wide{grid-column:auto}
+  /* matices de satén por categoría */
+  .cat.c1 .satin{filter:hue-rotate(0deg)}
+  .cat.c2 .satin{filter:hue-rotate(-14deg) saturate(1.1)}
+  .cat.c3 .satin{filter:hue-rotate(12deg) brightness(1.05)}
+  .cat.c4 .satin{filter:hue-rotate(-8deg) brightness(.92)}
+  .cat.c5 .satin{filter:hue-rotate(20deg) saturate(.9)}
+  @media (max-width:900px){.cats{grid-template-columns:repeat(3,1fr);grid-auto-rows:130px}}
+  @media (max-width:560px){
+    .cats{grid-template-columns:1fr 1fr;grid-auto-rows:112px;gap:10px}
+    .cat .lab h3,.cat.big .lab h3{font-size:1rem}
+    .cat .lab{padding:12px 14px}
+    .cat .mono{font-size:1.4rem;top:10px;left:12px}
+  }
+
+  /* ---- Destacados ---- */
+  .grid-prod{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+  @media (max-width:980px){.grid-prod{grid-template-columns:1fr 1fr}}
+  @media (max-width:520px){.grid-prod{grid-template-columns:1fr}}
+  .prod{border:1px solid var(--linea);border-radius:var(--r);overflow:hidden;background:var(--noche-2);
+    transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease}
+  .prod:hover{transform:translateY(-4px);border-color:var(--oro-tenue);box-shadow:0 16px 40px rgba(0,0,0,.5)}
+  .prod .ph{position:relative;aspect-ratio:1/1;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .prod .ph .satin{transition:transform .8s ease}
+  .prod:hover .ph .satin{transform:scale(1.07)}
+  .prod .ph .mk{position:relative;z-index:2;font-family:var(--script);font-size:3.4rem;
+    color:rgba(255,224,166,.35);text-shadow:0 0 20px rgba(216,50,74,.5)}
+  .prod .tag{position:absolute;z-index:3;top:12px;left:12px;font-size:.66rem;letter-spacing:.16em;
+    text-transform:uppercase;background:rgba(11,4,6,.7);border:1px solid var(--linea);
+    color:var(--oro);padding:.3em .7em;border-radius:999px}
+  .prod .body{padding:16px 16px 18px}
+  .prod .cat-mini{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--marfil-2)}
+  .prod h4{font-family:var(--serif);font-weight:500;font-size:1.12rem;margin:.25em 0 .5em}
+  .prod .row{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-top:.6rem}
+  .prod .price{font-family:var(--sans);font-weight:700;font-size:1.05rem;color:var(--oro);
+    font-variant-numeric:tabular-nums}
+  .prod .mini-wa{display:inline-flex;align-items:center;gap:.4em;font-size:.8rem;font-weight:600;
+    color:var(--marfil);border:1px solid var(--linea);border-radius:999px;padding:.45em .9em;
+    transition:border-color .25s ease,color .25s ease}
+  .prod .mini-wa:hover{border-color:var(--verde-wa);color:var(--verde-wa)}
+  .prod .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+  .cat .ph-img,.slide .ph-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+  .backlink{display:inline-flex;align-items:center;gap:.5em;background:none;border:0;color:var(--oro);
+    font-family:var(--sans);font-weight:600;font-size:.9rem;cursor:pointer;padding:.3em 0;margin-bottom:1.4rem;letter-spacing:.02em}
+  .backlink:hover{gap:.85em}
+  .col-empty{border:1px dashed var(--linea);border-radius:var(--r);padding:3rem 1.5rem;text-align:center;color:var(--marfil-2)}
+  .col-count{font-size:.8rem;color:var(--marfil-2);letter-spacing:.02em}
+  [hidden]{display:none!important}
+  .hue1{filter:hue-rotate(0deg)}
+  .hue2{filter:hue-rotate(-16deg) saturate(1.12)}
+  .hue3{filter:hue-rotate(14deg) brightness(1.06)}
+  .hue4{filter:hue-rotate(-8deg) brightness(.92)}
+  .hue5{filter:hue-rotate(22deg) saturate(.9)}
+
+  /* ---- Banda discreción ---- */
+  .discret{position:relative;overflow:hidden;border-top:1px solid var(--linea);border-bottom:1px solid var(--linea)}
+  .discret .satin{filter:brightness(.55) saturate(.85)}
+  .discret .vign{position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(6,2,3,.92),rgba(6,2,3,.55))}
+  .discret-in{position:relative;z-index:2;padding:clamp(44px,6vw,76px) 0;max-width:640px}
+  .discret-in h2{font-family:var(--serif);font-weight:500;font-size:clamp(2rem,5vw,3.4rem);line-height:1.05;text-wrap:balance}
+  .discret-in h2 em{font-style:italic;color:var(--oro)}
+  .discret-in p{color:var(--marfil);margin-top:1.2rem;font-size:1.08rem;max-width:52ch}
+  .discret-list{display:flex;flex-direction:column;gap:1rem;margin-top:2rem}
+  .discret-list li{display:flex;gap:.9rem;align-items:flex-start;list-style:none}
+  .discret-list svg{width:22px;height:22px;color:var(--oro);flex:none;margin-top:2px}
+  .discret-list b{font-weight:600}
+  .discret-list span{color:var(--marfil-2);font-size:.92rem}
+
+  /* ---- Por qué ---- */
+  .why{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+  @media (max-width:860px){.why{grid-template-columns:1fr;gap:36px}}
+  .why-list{display:flex;flex-direction:column;gap:2px;border:1px solid var(--linea);border-radius:var(--r);overflow:hidden}
+  .why-item{padding:1.5rem;background:var(--noche-2);display:flex;gap:1.1rem;align-items:flex-start;
+    transition:background .3s ease}
+  .why-item:hover{background:#1a070b}
+  .why-item svg{width:30px;height:30px;color:var(--oro);flex:none}
+  .why-item h4{font-family:var(--serif);font-weight:500;font-size:1.2rem;margin-bottom:.25em}
+  .why-item p{color:var(--marfil-2);font-size:.93rem}
+  .why-copy .section-title{margin-bottom:1rem}
+  .why-copy p{color:var(--marfil-2);max-width:42ch}
+
+  /* ---- Testimonios ---- */
+  .quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media (max-width:860px){.quotes{grid-template-columns:1fr}}
+  .quote{border:1px solid var(--linea);border-radius:var(--r);padding:2rem 1.75rem;background:var(--noche-2);position:relative}
+  .quote .mark{font-family:var(--serif);font-size:3.5rem;line-height:.4;color:var(--oro-tenue);position:absolute;top:22px;right:22px}
+  .quote p{font-family:var(--serif);font-style:italic;font-size:1.08rem;color:var(--marfil);position:relative;z-index:1}
+  .quote .who{margin-top:1.4rem;display:flex;align-items:center;gap:.8rem}
+  .quote .av{width:38px;height:38px;border-radius:999px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--carmin),var(--vino));color:var(--marfil);font-weight:700;font-size:.85rem}
+  .quote .who b{font-size:.9rem}
+  .quote .who small{display:block;color:var(--marfil-2);font-size:.75rem}
+
+  /* ---- CTA final ---- */
+  .cta-final{position:relative;overflow:hidden}
+  .cta-final .vign{position:absolute;inset:0;z-index:1;
+    background:radial-gradient(90% 120% at 50% 0%, transparent 30%, rgba(6,2,3,.85) 85%)}
+  .cta-in{position:relative;z-index:2;text-align:center;padding:clamp(48px,6vw,88px) 0;
+    display:flex;flex-direction:column;align-items:center;gap:1.2rem}
+  .cta-in .neon{font-size:clamp(2.6rem,8vw,5rem)}
+  .cta-in p{color:var(--marfil);max-width:40ch;font-size:1.1rem}
+
+  /* ---- Footer ---- */
+  footer{background:var(--noche-2);border-top:1px solid var(--linea);padding:64px 0 30px}
+  .foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:40px}
+  @media (max-width:860px){.foot-grid{grid-template-columns:1fr 1fr}}
+  @media (max-width:520px){.foot-grid{grid-template-columns:1fr}}
+  .foot-brand .n{font-family:var(--script);font-size:2.6rem;color:var(--oro-neon);
+    text-shadow:0 0 14px rgba(255,200,120,.4);line-height:1}
+  .foot-brand p{color:var(--marfil-2);font-size:.9rem;margin-top:.6rem;max-width:30ch}
+  .foot-col h5{font-family:var(--sans);font-weight:600;font-size:.75rem;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--oro);margin-bottom:1.1rem}
+  .foot-col a,.foot-col p{display:block;color:var(--marfil-2);font-size:.9rem;margin-bottom:.7rem;transition:color .2s ease}
+  .foot-col a:hover{color:var(--marfil)}
+  .foot-col .ig-row{display:flex;align-items:center;gap:.5em}
+  .foot-bottom{border-top:1px solid var(--linea);margin-top:48px;padding-top:24px;
+    display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;
+    color:var(--marfil-2);font-size:.78rem}
+  .foot-bottom a{color:var(--oro)}
+
+  /* ============ REVEAL al scroll ============ */
+  .rev{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+  .rev.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.rev{opacity:1;transform:none;transition:none}}
+
+  /* ============ AVISO +18 (modal sobre la página ya visible) ============ */
+  #gate{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+    padding:24px;background:rgba(8,3,4,.66);backdrop-filter:blur(7px);transition:opacity .5s ease}
+  #gate .card{position:relative;z-index:2;width:100%;max-width:400px;text-align:center;
+    background:linear-gradient(180deg,#1a070b,#120508);border:1px solid var(--linea);
+    border-radius:20px;padding:36px 30px;display:flex;flex-direction:column;align-items:center;gap:1rem;
+    box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  #gate .badge{width:64px;height:64px;border-radius:999px;display:grid;place-items:center;
+    background:radial-gradient(circle at 50% 65%, rgba(216,50,74,.35), transparent 70%)}
+  #gate .badge svg{width:38px;height:40px;filter:drop-shadow(0 0 10px rgba(255,180,90,.7));
+    transform-origin:50% 90%;animation:llama 2.4s ease-in-out infinite}
+  @keyframes llama{0%,100%{transform:scale(1) rotate(-1.5deg);filter:drop-shadow(0 0 8px rgba(255,170,70,.6))}
+    50%{transform:scale(1.06) rotate(1.5deg);filter:drop-shadow(0 0 16px rgba(255,190,90,.9))}}
+  @media (prefers-reduced-motion:reduce){#gate .badge svg{animation:none}}
+  #gate .card .mini{font-family:var(--script);font-size:2rem;color:var(--oro-neon);
+    text-shadow:0 0 12px rgba(255,200,120,.4);line-height:1}
+  #gate h2{font-family:var(--serif);font-weight:500;font-size:1.3rem}
+  #gate p{color:var(--marfil-2);font-size:.9rem;max-width:34ch}
+  #gate .g-btns{display:flex;flex-direction:column;gap:.7rem;width:100%;margin-top:.4rem}
+  #gate .g-btns .btn{justify-content:center}
+  #gate .leave{font-size:.82rem;color:var(--marfil-2);text-decoration:underline;padding:.2em}
+  #gate.hide{opacity:0;pointer-events:none}
+  body.locked{overflow:hidden}
+</style>
+
+<!-- ================= AVISO +18 (encima de la página) ================= -->
+<div id="gate">
+  <div class="card">
+    <div class="badge">
+      <svg viewBox="0 0 24 26" fill="none"><path d="M12 1c2.6 4.8-3.4 6.4-3.4 11.4a6 6 0 007.9 5.7c-1.2.2-3.3-.6-3.3-3 0-2.7 3-3.4 3-6.6 2.1 1.4 4.8 4.3 4.8 8.1A8.2 8.2 0 013.9 12C3.9 5.6 9.4 5.6 12 1z" fill="url(#fg)"/><defs><linearGradient id="fg" x1="12" y1="1" x2="12" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE0A6"/><stop offset=".5" stop-color="#E8C07A"/><stop offset="1" stop-color="#D8324A"/></linearGradient></defs></svg>
+    </div>
+    <div class="mini">Temptress</div>
+    <h2>Solo para mayores de 18</h2>
+    <p>Este sitio contiene productos para adultos. Confirmá que sos mayor de edad para continuar.</p>
+    <div class="g-btns">
+      <button class="btn btn-oro" onclick="entrar()">Soy mayor de 18 — Entrar</button>
+      <a class="leave" href="https://www.google.com">Soy menor, salir</a>
+    </div>
+  </div>
+</div>
+
+<!-- ================= NAV ================= -->
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand-mini" href="#top">
+      <span class="n">Temptress</span>
+      <span class="t">Sex Shop</span>
+    </a>
+    <nav class="links">
+      <a href="#categorias">Categorías</a>
+      <a href="#destacados">Destacados</a>
+      <a href="#discrecion">Discreción</a>
+      <a href="#nosotras">Nosotras</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-ghost" href="#categorias">Ver catálogo</a>
+      <a class="btn btn-wa nav-wa" href="https://wa.link/834moo" aria-label="Escribinos por WhatsApp">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M.06 24l1.68-6.16A11.9 11.9 0 010 11.94C0 5.35 5.35 0 11.94 0a11.9 11.9 0 018.42 3.5 11.9 11.9 0 013.5 8.44c0 6.58-5.35 11.93-11.93 11.93a11.9 11.9 0 01-5.7-1.45L.06 24zm6.6-3.8c1.68 1 3.28 1.6 5.28 1.6 5.46 0 9.9-4.43 9.9-9.9 0-5.45-4.44-9.88-9.9-9.88C6.5 2 2.06 6.44 2.06 11.9c0 2.1.6 3.66 1.62 5.35l-.99 3.62 3.97-.67zm11.4-5.7c-.08-.13-.27-.2-.56-.34-.29-.15-1.7-.84-1.96-.94-.26-.1-.46-.14-.65.14-.19.29-.75.94-.92 1.13-.17.19-.34.21-.63.07-.29-.15-1.22-.45-2.32-1.43-.86-.77-1.44-1.72-1.6-2-.17-.29-.02-.44.13-.59.13-.13.29-.34.43-.5.15-.17.19-.29.29-.48.1-.19.05-.36-.02-.5-.07-.15-.65-1.56-.89-2.13-.24-.56-.47-.48-.65-.49l-.55-.01c-.19 0-.5.07-.76.36-.26.29-1 .97-1 2.38 0 1.4 1.02 2.75 1.17 2.94.15.19 2.02 3.08 4.9 4.32.68.29 1.21.47 1.63.6.68.22 1.31.19 1.8.11.55-.08 1.7-.69 1.94-1.36.24-.67.24-1.24.17-1.36z"/></svg>
+        <span class="wa-txt">WhatsApp</span>
+      </a>
+      <button class="burger" onclick="document.getElementById('m').classList.toggle('open')" aria-label="Menú">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="home">
+<!-- ================= HERO ================= -->
+<div id="top"></div>
+<section class="hero">
+  <div class="satin"></div>
+  <div class="vign"></div>
+  <span class="plus18">+18</span>
+  <div class="hero-in">
+    <div class="lockup rev">
+      <div class="neon flicker">Temptress</div>
+      <div class="sub">Sex Sh
+        <svg width="16" height="18" viewBox="0 0 14 16" fill="none"><path d="M7 0c1.5 3-2 4-2 7a4 4 0 108 0c0-2-1-3-1-4 2 1 2 4 2 5A6 6 0 111 8c0-4 4-4 6-8z" fill="#D8324A"/></svg>P
+      </div>
+    </div>
+    <p class="tagline rev">Placer con clase.</p>
+    <p class="support rev">Tu boutique íntima en Asunción. Elegí en privado, te llega de forma discreta — a cualquier punto del Paraguay.</p>
+    <div class="cta-row rev">
+      <a class="btn btn-oro" href="#categorias">Ver catálogo</a>
+      <a class="btn btn-ghost" href="https://wa.link/834moo">Escribinos por WhatsApp</a>
+    </div>
+  </div>
+  <div class="scrollcue"><span></span>Deslizá</div>
+</section>
+
+<!-- ================= TRUST ================= -->
+<section class="trust">
+  <div class="wrap"><div class="trust-in">
+    <div class="trust-cell">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 10h18M8 7V5a4 4 0 018 0v2"/></svg>
+      <div><b>Envío discreto</b><small>Llega sin revelar su contenido</small></div>
+    </div>
+    <div class="trust-cell">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13V6a1 1 0 011-1h11v11H4a1 1 0 01-1-1z"/><path d="M15 8h4l2 3v4a1 1 0 01-1 1h-5V8z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+      <div><b>Envíos a todo el país</b><small>Asunción, Central e interior</small></div>
+    </div>
+    <div class="trust-cell">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+      <div><b>Pago a tu manera</b><small>Al recibir o por transferencia</small></div>
+    </div>
+    <div class="trust-cell">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.4 8.4 0 01-11.9 7.6L3 21l1.9-6.1A8.4 8.4 0 1121 11.5z"/></svg>
+      <div><b>Asesoría personalizada</b><small>Te acompañamos en cada elección</small></div>
+    </div>
+  </div></div>
+</section>
+
+<!-- ================= CARRUSEL ================= -->
+<section class="carru-sec">
+  <div class="wrap">
+    <div class="carru">
+      <div class="carru-track" id="carru"></div>
+      <button class="carru-btn carru-prev" onclick="carruMove(-1)" aria-label="Anterior">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+      <button class="carru-btn carru-next" onclick="carruMove(1)" aria-label="Siguiente">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+    <div class="carru-dots" id="carruDots"></div>
+  </div>
+</section>
+
+<!-- ================= CATEGORÍAS ================= -->
+<section class="blk" id="categorias">
+  <div class="wrap">
+    <div class="head-row rev">
+      <div>
+        <span class="eyebrow">Colecciones</span>
+        <h2 class="section-title">Explorá por <em>deseo</em></h2>
+        <p>Piezas elegidas con criterio, para cada momento.</p>
+      </div>
+      <a class="verlink" href="#categorias">Ver el catálogo →</a>
+    </div>
+    <div class="cats rev" id="catsGrid"></div>
+  </div>
+</section>
+
+<!-- ================= DESTACADOS ================= -->
+<section class="blk" id="destacados" style="padding-top:0">
+  <div class="wrap">
+    <div class="head-row rev">
+      <div>
+        <span class="eyebrow">Selección</span>
+        <h2 class="section-title">Las piezas más <em>codiciadas</em></h2>
+        <p>Nuestra selección de temporada, elegida para vos.</p>
+      </div>
+      <a class="verlink" href="https://wa.link/834moo">Consultá por privado →</a>
+    </div>
+    <div class="grid-prod rev" id="prodGrid"></div>
+  </div>
+</section>
+
+<!-- ================= DISCRECIÓN ================= -->
+<section class="discret" id="discrecion">
+  <div class="satin"></div><div class="vign"></div>
+  <div class="wrap"><div class="discret-in rev">
+    <span class="eyebrow">Tu privacidad, primero</span>
+    <h2>Discreción, de <em>principio a fin</em>.</h2>
+    <p>Elegís desde la comodidad de tu casa, coordinamos en privado y tu pedido llega con la mayor reserva.</p>
+    <ul class="discret-list">
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>
+        <div><b>Envío discreto.</b> <span>Tu pedido viaja en un empaque sobrio, sin nada que revele su contenido.</span></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/></svg>
+        <div><b>Confidencialidad total.</b> <span>Tus datos quedan entre vos y nosotras. Nunca se comparten.</span></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.4 8.4 0 01-11.9 7.6L3 21l1.9-6.1A8.4 8.4 0 1121 11.5z"/></svg>
+        <div><b>Asesoría con criterio.</b> <span>Consultanos lo que quieras: te orientamos con respeto y absoluta reserva.</span></div>
+      </li>
+    </ul>
+  </div></div>
+</section>
+
+<!-- ================= POR QUÉ / NOSOTRAS ================= -->
+<section class="blk" id="nosotras">
+  <div class="wrap why">
+    <div class="why-copy rev">
+      <span class="eyebrow">Por qué Temptress</span>
+      <h2 class="section-title">No es solo comprar. Es <em>animarse</em> bien acompañada.</h2>
+      <p>Somos una tienda de Asunción hecha para que explorar tu intimidad sea fácil, seguro y hasta lindo. Sin morbo, sin apuro, con productos que valen lo que cuestan.</p>
+    </div>
+    <div class="why-list rev">
+      <div class="why-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg>
+        <div><h4>Curaduría, no relleno</h4><p>Elegimos cada producto a mano. Si está acá, es porque lo recomendamos.</p></div>
+      </div>
+      <div class="why-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M20 6L9 17l-5-5"/></svg>
+        <div><h4>Productos con garantía</h4><p>Materiales aptos para el cuerpo y marcas que responden.</p></div>
+      </div>
+      <div class="why-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 21C7 17 3 13 3 8.5A4.5 4.5 0 0112 6a4.5 4.5 0 019 2.5C21 13 17 17 12 21z"/></svg>
+        <div><h4>Trato cercano</h4><p>Te atendemos como personas, no como un número de pedido.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TESTIMONIOS ================= -->
+<section class="blk" style="padding-top:0">
+  <div class="wrap">
+    <div class="head-row rev"><div>
+      <span class="eyebrow">Lo que dicen</span>
+      <h2 class="section-title">Clientas que <em>volvieron</em></h2>
+    </div></div>
+    <div class="quotes rev">
+      <div class="quote"><span class="mark">”</span>
+        <p>Llegó rapidísimo y en una caja que ni mi mamá se dio cuenta. Diez puntos la atención.</p>
+        <div class="who"><span class="av">S.M.</span><div><b>S. M.</b><small>Asunción</small></div></div>
+      </div>
+      <div class="quote"><span class="mark">”</span>
+        <p>Me daba cosa preguntar y me trataron re bien. Me ayudaron a elegir sin hacerme sentir mal.</p>
+        <div class="who"><span class="av">R.C.</span><div><b>R. C.</b><small>Luque</small></div></div>
+      </div>
+      <div class="quote"><span class="mark">”</span>
+        <p>La calidad se nota. No es lo barato de siempre, se ve que eligen bien las cosas.</p>
+        <div class="who"><span class="av">D.V.</span><div><b>D. V.</b><small>Encarnación</small></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA FINAL ================= -->
+<section class="cta-final">
+  <div class="satin"></div><div class="vign"></div>
+  <div class="wrap"><div class="cta-in rev">
+    <span class="eyebrow">Date el gusto</span>
+    <div class="neon">Explorá tu deseo.</div>
+    <p>Escribinos por privado y armamos tu pedido con total discreción.</p>
+    <a class="btn btn-wa" href="https://wa.link/834moo">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M.06 24l1.68-6.16A11.9 11.9 0 010 11.94C0 5.35 5.35 0 11.94 0a11.9 11.9 0 018.42 3.5 11.9 11.9 0 013.5 8.44c0 6.58-5.35 11.93-11.93 11.93a11.9 11.9 0 01-5.7-1.45L.06 24zm6.6-3.8c1.68 1 3.28 1.6 5.28 1.6 5.46 0 9.9-4.43 9.9-9.9 0-5.45-4.44-9.88-9.9-9.88C6.5 2 2.06 6.44 2.06 11.9c0 2.1.6 3.66 1.62 5.35l-.99 3.62 3.97-.67z"/></svg>
+      Escribinos
+    </a>
+  </div></div>
+</section>
+
+</main>
+
+<!-- ================= PÁGINA DE COLECCIÓN ================= -->
+<main id="coleccion" hidden>
+  <section class="blk">
+    <div class="wrap">
+      <button class="backlink" onclick="verHome()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg>
+        Volver al inicio
+      </button>
+      <div class="head-row">
+        <div>
+          <span class="eyebrow" id="colEyebrow">Colección</span>
+          <h2 class="section-title" id="colTitulo"></h2>
+          <p class="col-count" id="colCount"></p>
+        </div>
+        <a class="verlink" href="https://wa.link/834moo">Consultá por privado →</a>
+      </div>
+      <div class="grid-prod" id="colGrid"></div>
+    </div>
+  </section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="n">Temptress</div>
+        <p>Boutique íntima en Asunción. Placer con clase, envíos discretos a todo el Paraguay.</p>
+      </div>
+      <div class="foot-col">
+        <h5>Categorías</h5>
+        <div id="footCats"></div>
+      </div>
+      <div class="foot-col">
+        <h5>Tienda</h5>
+        <a href="#discrecion">Discreción</a>
+        <a href="#nosotras">Nosotras</a>
+        <a href="#destacados">Destacados</a>
+        <a href="https://wa.link/834moo">Cómo comprar</a>
+      </div>
+      <div class="foot-col">
+        <h5>Contacto</h5>
+        <a href="https://wa.link/834moo" class="ig-row">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.06 24l1.68-6.16A11.9 11.9 0 010 11.94C0 5.35 5.35 0 11.94 0a11.9 11.9 0 018.42 3.5 11.9 11.9 0 013.5 8.44c0 6.58-5.35 11.93-11.93 11.93a11.9 11.9 0 01-5.7-1.45L.06 24z"/></svg>
+          wa.link/834moo
+        </a>
+        <a href="https://instagram.com/temptress798" class="ig-row">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+          @temptress798
+        </a>
+        <p>Asunción · Paraguay</p>
+        <p>Envíos a todo el país</p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Temptress · Sex Shop. Solo para mayores de 18 años.</span>
+      <span>Un sistema de <a href="https://orbepy.com">orbepy</a></span>
+    </div>
+  </div>
+</footer>
+
+<!-- ================= MENÚ MÓVIL ================= -->
+<div id="m" style="position:fixed;inset:0;z-index:60;background:rgba(11,4,6,.97);backdrop-filter:blur(10px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.6rem;font-family:var(--serif);font-size:1.6rem">
+  <a href="#categorias" onclick="cerrarM()">Categorías</a>
+  <a href="#destacados" onclick="cerrarM()">Destacados</a>
+  <a href="#discrecion" onclick="cerrarM()">Discreción</a>
+  <a href="#nosotras" onclick="cerrarM()">Nosotras</a>
+  <a class="btn btn-wa" style="font-family:var(--sans);font-size:1rem" href="https://wa.link/834moo">WhatsApp</a>
+  <button onclick="cerrarM()" style="position:absolute;top:24px;right:24px;background:none;border:0;color:var(--marfil);font-size:2rem;cursor:pointer">×</button>
+</div>
+<style>#m.open{display:flex}</style>
+
+<script>
+  /* ===========================================================
+     Los datos vienen EN VIVO de tu app (Firebase, nodo /web).
+     Publicás desde la app → esta página se actualiza sola al recargar.
+     Solo llega lo público (nombre, categoría, precio, foto, destacado);
+     los productos sin stock ya vienen filtrados desde la app.
+  =========================================================== */
+  var DBURL='https://temptress-bfdaa-default-rtdb.firebaseio.com/web.json';
+  var WA='https://wa.link/834moo';
+  var DATA={ categorias:[], productos:[], carrusel:[], hero:null, tienda:null };
+
+  /* ---------- helpers ---------- */
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function gs(n){return '₲ '+(Number(n)||0).toLocaleString('es-PY');}
+  function enStock(p){return Number(p.stock)>0;}
+  function hue(i){return 'hue'+((i%5)+1);}
+  function catHue(cat){var i=DATA.categorias.indexOf(cat); return hue(i<0?0:i);}
+
+  function prodCard(p){
+    var ph = p.foto ? '<img src="'+esc(p.foto)+'" alt="'+esc(p.nombre)+'">'
+                    : '<div class="satin '+catHue(p.cat)+'"></div><span class="mk">T</span>';
+    var tag = p.etiqueta ? '<span class="tag">'+esc(p.etiqueta)+'</span>' : '';
+    return '<article class="prod">'+
+      '<div class="ph">'+ph+tag+'</div>'+
+      '<div class="body">'+
+        '<span class="cat-mini">'+esc(p.cat)+'</span>'+
+        '<h4>'+esc(p.nombre)+'</h4>'+
+        '<div class="row"><span class="price">'+gs(p.precio)+'</span>'+
+        '<a class="mini-wa" href="'+WA+'">Consultar</a></div>'+
+      '</div></article>';
+  }
+
+  /* ---------- render ---------- */
+  function renderCategorias(){
+    document.getElementById('catsGrid').innerHTML = DATA.categorias.map(function(c,i){
+      return '<a class="cat" data-cat="'+esc(c)+'">'+
+        '<div class="satin '+hue(i)+'"></div><div class="film"></div>'+
+        '<span class="mono">'+esc(c.trim().charAt(0).toUpperCase())+'</span>'+
+        '<div class="lab"><h3>'+esc(c)+'</h3><span class="go">Ver productos →</span></div></a>';
+    }).join('');
+    document.getElementById('footCats').innerHTML = DATA.categorias.map(function(c){
+      return '<a href="#" data-cat="'+esc(c)+'">'+esc(c)+'</a>';
+    }).join('');
+  }
+  function renderDestacados(){
+    var items=DATA.productos.filter(function(p){return p.destacado && enStock(p);});
+    document.getElementById('prodGrid').innerHTML = items.length
+      ? items.map(prodCard).join('')
+      : '<div class="col-empty">Pronto sumamos nuestras piezas destacadas.</div>';
+  }
+  function renderCarrusel(){
+    document.getElementById('carru').innerHTML = DATA.carrusel.map(function(s,i){
+      var media = s.foto ? '<img class="ph-img" src="'+esc(s.foto)+'" alt="">'
+                         : '<div class="satin '+hue(i)+'"></div>';
+      var precio = s.precio ? '<span class="price">'+esc(s.precio)+'</span>' : '';
+      var btn = s.cat ? '<button class="btn btn-oro" data-cat="'+esc(s.cat)+'">'+esc(s.cta)+'</button>'
+                      : '<a class="btn btn-oro" href="'+esc(s.href||WA)+'">'+esc(s.cta)+'</a>';
+      return '<div class="slide">'+media+'<div class="film"></div>'+
+        '<div class="s-in"><span class="eyebrow">'+esc(s.eyebrow)+'</span>'+
+        '<h3>'+s.titulo+'</h3><p>'+esc(s.texto)+'</p>'+precio+btn+'</div></div>';
+    }).join('');
+  }
+
+  /* ---------- navegación entre "páginas" ---------- */
+  function verColeccion(cat){
+    var items=DATA.productos.filter(function(p){return p.cat===cat && enStock(p);});
+    document.getElementById('colTitulo').innerHTML=esc(cat);
+    document.getElementById('colCount').textContent = items.length
+      ? items.length+(items.length===1?' pieza disponible':' piezas disponibles') : '';
+    document.getElementById('colGrid').innerHTML = items.length
+      ? items.map(prodCard).join('')
+      : '<div class="col-empty">Pronto sumamos piezas a esta colección.<br>Escribinos por WhatsApp y te avisamos.</div>';
+    document.getElementById('home').hidden=true;
+    document.getElementById('coleccion').hidden=false;
+    window.scrollTo(0,0);
+  }
+  function verHome(){
+    document.getElementById('coleccion').hidden=true;
+    document.getElementById('home').hidden=false;
+  }
+  window.verColeccion=verColeccion; window.verHome=verHome;
+
+  /* ---------- Age gate + menú ---------- */
+  document.body.classList.add('locked');
+  function entrar(){
+    var g=document.getElementById('gate'); g.classList.add('hide');
+    document.body.classList.remove('locked');
+    setTimeout(function(){g.style.display='none';},600);
+  }
+  function cerrarM(){document.getElementById('m').classList.remove('open');}
+  window.entrar=entrar; window.cerrarM=cerrarM;
+
+  /* ---------- Carrusel ---------- */
+  function initCarru(){
+    var track=document.getElementById('carru'); if(!track||!track.children.length) return;
+    var slides=track.children, n=slides.length, cur=0;
+    var dotsWrap=document.getElementById('carruDots'); dotsWrap.innerHTML='';
+    for(var i=0;i<n;i++){(function(idx){var b=document.createElement('button');
+      if(idx===0)b.className='on'; b.setAttribute('aria-label','Ir a '+(idx+1));
+      b.onclick=function(){goTo(idx);}; dotsWrap.appendChild(b);})(i);}
+    var dots=dotsWrap.children;
+    function step(){return slides[0].getBoundingClientRect().width+16;}
+    function goTo(i){cur=(i+n)%n; track.scrollTo({left:step()*cur,behavior:'smooth'}); paint();}
+    function paint(){for(var i=0;i<n;i++){dots[i].className=(i===cur?'on':'');}}
+    window.carruMove=function(d){goTo(cur+d);};
+    var stt; track.addEventListener('scroll',function(){clearTimeout(stt);
+      stt=setTimeout(function(){var i=Math.round(track.scrollLeft/step()); if(i!==cur){cur=i;paint();}},120);});
+    var reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches, timer;
+    function play(){if(reduce)return; stop(); timer=setInterval(function(){goTo(cur+1);},5500);}
+    function stop(){if(timer)clearInterval(timer);}
+    track.addEventListener('pointerenter',stop); track.addEventListener('pointerleave',play);
+    play();
+  }
+
+  /* ---------- click delegado ---------- */
+  document.addEventListener('click',function(e){
+    var dc=e.target.closest('[data-cat]');
+    if(dc){ e.preventDefault(); verColeccion(dc.getAttribute('data-cat')); cerrarM(); return; }
+    var a=e.target.closest('a[href^="#"]');
+    if(a){ verHome(); cerrarM(); }
+  });
+
+  /* ---------- carga desde Firebase ---------- */
+  function normalizarWA(w){
+    w=String(w||'').trim();
+    if(/^https?:\/\//i.test(w))return w;
+    if(/wa\.link|wa\.me|api\.whatsapp/i.test(w))return 'https://'+w.replace(/^\/+/,'');
+    var d=w.replace(/\D/g,''); if(d)return 'https://wa.me/'+d;
+    return 'https://wa.link/834moo';
+  }
+  function aplicarWA(){
+    document.querySelectorAll('a[href*="wa.link"],a[href*="wa.me"]').forEach(function(a){a.href=WA;});
+  }
+  function pintarTodo(){
+    var wa=(DATA.tienda&&DATA.tienda.wa)||'wa.link/834moo';
+    WA=normalizarWA(wa); aplicarWA();
+    if(DATA.hero){
+      var t=document.querySelector('.hero .tagline'); if(t&&DATA.hero.tagline)t.textContent=DATA.hero.tagline;
+      var s=document.querySelector('.hero .support'); if(s&&DATA.hero.texto)s.textContent=DATA.hero.texto;
+    }
+    renderCarrusel(); renderCategorias(); renderDestacados(); initCarru();
+    var cs=document.querySelector('.carru-sec'); if(cs)cs.style.display=DATA.carrusel.length?'':'none';
+    if(!DATA.productos.length){
+      var pg=document.getElementById('prodGrid');
+      if(pg)pg.innerHTML='<div class="col-empty">Muy pronto nuestro catálogo. Escribinos por WhatsApp y te contamos las novedades.</div>';
+    }
+    document.querySelectorAll('.rev').forEach(function(el){io.observe(el);});
+  }
+  function aplicar(d){
+    if(d && (d.productos||d.categorias)){
+      DATA.categorias=d.categorias||[];
+      DATA.productos=(d.productos||[]).map(function(p){return {
+        id:p.id, nombre:p.nombre, cat:p.cat, precio:p.precio, foto:p.foto||null,
+        stock:1, destacado:!!p.destacado, etiqueta:p.etiqueta||''
+      };});
+      DATA.carrusel=(d.carrusel||[]).filter(function(s){return s.titulo||s.foto;}).map(function(s){return {
+        eyebrow:s.cat||'Temptress', titulo:s.titulo||'', texto:s.texto||'',
+        cta:s.cat?'Ver colección':'Ver más', cat:s.cat||'', foto:s.foto||null
+      };});
+      DATA.tienda=d.tienda||null;
+      DATA.hero=d.hero||null;
+    }
+    pintarTodo();
+  }
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:.12});
+
+  /* ---------- arranque ---------- */
+  fetch(DBURL).then(function(r){return r.json();}).then(aplicar).catch(function(){ aplicar(null); });
+</script>

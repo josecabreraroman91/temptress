@@ -355,7 +355,11 @@ function estadoInicial(){
     tienda:{nombre:'Temptress', sub:'Sex Shop · Asunción', logo:'', inicial:'T', wa:'wa.link/834moo'},
     productos:[], pedidos:[],
     categorias:['General'],
-    ajustes:{minimoDefault:2}
+    ajustes:{minimoDefault:2},
+    web:{
+      hero:{tagline:'Placer con clase.', texto:'Tu boutique íntima en Asunción. Elegí en privado, te llega de forma discreta — a cualquier punto del Paraguay.'},
+      carrusel:[]
+    }
   };
 }
 /* Guardar: cache local inmediato + escritura a la nube (con rebote de 600ms).
@@ -643,6 +647,15 @@ function vAjustes(){
     '<div class="field"><label>Avisar para reponer cuando queden</label><input id="aj_min" inputmode="numeric" value="'+(S.ajustes.minimoDefault)+'"></div>'+
     '<button class="btn btn-brand" onclick="guardarAjustes()">Guardar</button></div>';
 
+  if(rol==='super'||rol==='admin'){
+    h+='<div class="sectit">Página web</div><div class="card pad">'+
+      '<div class="hint" style="margin-bottom:10px">Tu vidriera pública. Editá el carrusel y los textos, y publicá cuando quieras que la web se actualice con tus productos, precios y fotos de ahora. Los productos sin stock no aparecen.</div>'+
+      '<button class="btn btn-ghost" style="margin-bottom:8px" onclick="abrirVidriera()">✏️ Editar vidriera (carrusel y textos)</button>'+
+      '<button class="btn btn-brand" onclick="publicarWeb()">🌐 Publicar a la web</button>'+
+      ((S.web&&S.web.ultimaPublicacion)?'<div class="hint" style="margin-top:8px">Última vez publicado: '+esc(S.web.ultimaPublicacion)+'</div>':'')+
+      '</div>';
+  }
+
   h+='<div class="sectit">Categorías <span class="cnt">'+S.categorias.length+'</span></div><div class="card pad">'+
     '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">'+
     S.categorias.map((c,i)=>'<span class="chip c-gold" style="padding:5px 10px">'+esc(c)+
@@ -724,6 +737,69 @@ function borrarTodo(){
   S=estadoInicial();save();render();toast('Todo borrado');
 }
 
+/* --------------------- VIDRIERA / WEB PÚBLICA --------------------- */
+/* La web pública NO lee la base de gestión (ahí están costos y pedidos).
+   "Publicar" arma una copia con solo lo que la clienta puede ver y la
+   escribe en el nodo /web, que es de lectura pública. */
+function abrirVidriera(){
+  const w=S.web||(S.web={hero:{tagline:'',texto:''},carrusel:[]});
+  if(!w.hero)w.hero={tagline:'',texto:''}; if(!w.carrusel)w.carrusel=[];
+  let h='<h3>Vidriera de la web</h3>';
+  h+='<div class="field"><label>Frase principal</label><input id="wb_tag" value="'+esc(w.hero.tagline||'')+'" placeholder="Placer con clase."></div>';
+  h+='<div class="field"><label>Texto bajo la frase</label><input id="wb_txt" value="'+esc(w.hero.texto||'')+'"></div>';
+  h+='<label>Carrusel (arriba de todo en la web)</label><div class="card" style="margin-bottom:10px">';
+  if(!w.carrusel.length)h+='<div class="hint" style="padding:6px 2px">Todavía sin slides. Agregá el primero abajo.</div>';
+  h+=w.carrusel.map((s,i)=>'<div style="border-bottom:1px solid var(--line);padding:10px 2px;display:flex;flex-direction:column;gap:6px">'+
+     '<input placeholder="Título (ej: Lencería de noche)" value="'+esc(s.titulo||'')+'" oninput="S.web.carrusel['+i+'].titulo=this.value">'+
+     '<input placeholder="Texto corto" value="'+esc(s.texto||'')+'" oninput="S.web.carrusel['+i+'].texto=this.value">'+
+     '<select onchange="S.web.carrusel['+i+'].cat=this.value">'+
+       '<option value="">— A qué colección lleva el botón —</option>'+
+       S.categorias.map(c=>'<option'+(c===s.cat?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select>'+
+     '<div style="display:flex;gap:8px;align-items:center">'+
+       (s.foto?'<div class="thumb" style="width:44px;height:44px"><img src="'+esc(s.foto)+'"></div>':'')+
+       '<input type="file" accept="image/*" onchange="fotoSlide(this,'+i+')" style="flex:1">'+
+       '<button class="linkbtn del" onclick="S.web.carrusel.splice('+i+',1);save();abrirVidriera()">Quitar</button></div>'+
+     '</div>').join('');
+  h+='</div><button class="btn btn-ghost" onclick="S.web.carrusel.push({titulo:\'\',texto:\'\',cat:\'\',foto:\'\'});save();abrirVidriera()">+ Agregar slide</button>';
+  h+='<button class="btn btn-brand" style="margin-top:10px" onclick="guardarVidriera()">Guardar vidriera</button>';
+  h+='<button class="btn btn-ghost" style="margin-top:8px" onclick="cerrarModal()">Cerrar</button>';
+  sheet(h);
+}
+function fotoSlide(inp,i){
+  const f=inp.files&&inp.files[0];if(!f)return;
+  comprimir(f,1000,d=>{S.web.carrusel[i].foto=d;save();abrirVidriera();});
+}
+function guardarVidriera(){
+  if(!S.web)S.web={hero:{},carrusel:[]};
+  if($('wb_tag'))S.web.hero.tagline=$('wb_tag').value.trim();
+  if($('wb_txt'))S.web.hero.texto=$('wb_txt').value.trim();
+  save();cerrarModal();toast('Vidriera guardada ✓');
+}
+function publicarWeb(){
+  if(!_fbReady||!rol){toast('Necesitás estar conectado para publicar');return;}
+  const productos=S.productos.filter(p=>stockDe(p)>0).map(p=>({
+    id:p.id, nombre:p.nombre, cat:p.cat||'General', precio:Number(p.precio)||0,
+    foto:p.foto||'', destacado:!!p.destacado, etiqueta:p.etiqueta||''
+  }));
+  if(!productos.length && !confirm('No hay productos con stock para mostrar. ¿Publicar igual (la web quedaría sin productos)?'))return;
+  const conStock={}; productos.forEach(p=>conStock[p.cat]=true);
+  const categorias=S.categorias.filter(c=>conStock[c]);   /* solo categorías que tienen algo en stock */
+  const web={
+    tienda:{nombre:S.tienda.nombre, wa:S.tienda.wa||''},
+    hero:(S.web&&S.web.hero)||{},
+    carrusel:((S.web&&S.web.carrusel)||[]).filter(s=>s.titulo||s.foto),
+    categorias:categorias,
+    productos:productos,
+    ts:Date.now()
+  };
+  _fbdb().ref('web').set(web).then(function(){
+    if(!S.web)S.web={hero:{},carrusel:[]};
+    S.web.ultimaPublicacion=new Date().toLocaleString('es-PY');
+    save();render();
+    toast('¡Publicado a la web! ✓ ('+productos.length+' productos)');
+  }).catch(function(e){ toast('No se pudo publicar: '+(e&&e.message||'error')); });
+}
+
 /* --------------------- FICHA DE PRODUCTO (modal) --------------------- */
 function cerrarModal(){ $('modal').innerHTML=''; editProd=null; editPed=null; borrador=null; document.body.style.overflow=''; }
 function sheet(inner){
@@ -731,7 +807,7 @@ function sheet(inner){
   document.body.style.overflow='hidden';
 }
 function abrirProd(id){
-  editProd=id?JSON.parse(JSON.stringify(prod(id))):{id:null,nombre:'',cat:S.categorias[0]||'General',foto:'',stock:0,costo:0,precio:0,minimo:null,variantes:[]};
+  editProd=id?JSON.parse(JSON.stringify(prod(id))):{id:null,nombre:'',cat:S.categorias[0]||'General',foto:'',stock:0,costo:0,precio:0,minimo:null,destacado:false,etiqueta:'',variantes:[]};
   pintarProd();
 }
 function pintarProd(){
@@ -764,6 +840,11 @@ function pintarProd(){
     h+='</div><div class="btn-row" style="margin-top:0"><button class="btn btn-ghost" onclick="agregarVariante()">+ Agregar</button>'+
        '<button class="btn btn-ghost" onclick="editProd.variantes=[];pintarProd()">Sin variantes</button></div>';
   }
+  h+='<div class="field"><label>Página web</label>'+
+     '<label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:6px 0">'+
+     '<input type="checkbox" id="pr_dest" '+(p.destacado?'checked':'')+' style="width:18px;height:18px;accent-color:var(--brand)">'+
+     '<span>⭐ Destacar en la home de la web</span></label>'+
+     '<input id="pr_etq" value="'+esc(p.etiqueta||'')+'" placeholder="Etiqueta opcional: Nuevo, Más vendido…"></div>';
   h+='<button class="btn btn-brand" onclick="guardarProd()">'+(esNuevo?'Guardar producto':'Guardar cambios')+'</button>';
   if(!esNuevo)h+='<button class="btn btn-danger" style="margin-top:8px" onclick="borrarProd()">Borrar producto</button>';
   h+='<button class="btn btn-ghost" style="margin-top:8px" onclick="cerrarModal()">Cancelar</button>';
@@ -830,6 +911,8 @@ function leerProdForm(){
   editProd.precio=num($('pr_precio').value);
   if($('pr_stock'))editProd.stock=num($('pr_stock').value);
   if($('pr_min'))editProd.minimo=$('pr_min').value.trim()===''?null:num($('pr_min').value);
+  if($('pr_dest'))editProd.destacado=$('pr_dest').checked;
+  if($('pr_etq'))editProd.etiqueta=$('pr_etq').value.trim();
 }
 function guardarProd(){
   leerProdForm();
