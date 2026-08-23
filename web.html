@@ -660,7 +660,7 @@
 <main id="coleccion" hidden>
   <section class="blk">
     <div class="wrap">
-      <button class="backlink" onclick="verHome()">
+      <button class="backlink" onclick="history.back()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg>
         Volver al inicio
       </button>
@@ -802,14 +802,15 @@
     }).join('');
   }
 
-  /* ---------- navegación entre "páginas" ---------- */
-  var _prodVolver=null;
+  /* ---------- navegación con historial del navegador ---------- */
+  var _cur='home';
   function ocultarVistas(){
     document.getElementById('home').hidden=true;
     document.getElementById('coleccion').hidden=true;
     var pr=document.getElementById('producto'); if(pr)pr.hidden=true;
   }
-  function verColeccion(cat){
+  function _showHome(){ ocultarVistas(); document.getElementById('home').hidden=false; }
+  function _showColeccion(cat){
     var items=DATA.productos.filter(function(p){return p.cat===cat && enStock(p);});
     document.getElementById('colTitulo').innerHTML=esc(cat);
     document.getElementById('colCount').textContent = items.length
@@ -817,17 +818,12 @@
     document.getElementById('colGrid').innerHTML = items.length
       ? items.map(prodCard).join('')
       : '<div class="col-empty">Pronto sumamos piezas a esta colección.<br>Escribinos por WhatsApp y te avisamos.</div>';
-    _prodVolver=function(){ verColeccion(cat); };
     ocultarVistas(); document.getElementById('coleccion').hidden=false;
-    window.scrollTo(0,0);
   }
-  function verHome(){
-    ocultarVistas(); document.getElementById('home').hidden=false;
-  }
-  function verProducto(id){
+  function _showProducto(id){
     var p=null,i;
     for(i=0;i<DATA.productos.length;i++){ if(String(DATA.productos[i].id)===String(id)){ p=DATA.productos[i]; break; } }
-    if(!p){ verHome(); return; }
+    if(!p){ _showHome(); return; }
     var fs=fotosDe(p);
     var slides = fs.length
       ? fs.map(function(src){return '<div class="g-slide"><img src="'+esc(src)+'" alt="'+esc(p.nombre)+'"></div>';}).join('')
@@ -838,7 +834,7 @@
       : '';
     var dots = fs.length>1 ? '<div class="g-dots" id="gDots"></div>' : '';
     var tag = p.etiqueta ? '<span class="tag" style="position:static;display:inline-block;margin-bottom:12px">'+esc(p.etiqueta)+'</span>' : '';
-    var h = '<button class="backlink" onclick="_prodVolver?_prodVolver():verHome()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg>Volver</button>'+
+    var h = '<button class="backlink" onclick="history.back()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg>Volver</button>'+
       '<div class="prod-detalle">'+
         '<div class="gal"><div class="g-track" id="gTrack">'+slides+'</div>'+arrows+dots+'</div>'+
         '<div class="prod-info">'+
@@ -871,6 +867,19 @@
     track.addEventListener('pointerenter',stop); track.addEventListener('pointerleave',play);
     play();
   }
+  function _render(st){
+    st=st||{v:'home'};
+    _cur=st.v;
+    if(st.v==='col') _showColeccion(st.cat);
+    else if(st.v==='prod') _showProducto(st.id);
+    else _showHome();
+    window.scrollTo(0,0);
+  }
+  function _nav(st){ try{ history.pushState(st,''); }catch(e){} _render(st); }
+  function verHome(){ if(_cur==='home'){ _showHome(); return; } _nav({v:'home'}); }
+  function verColeccion(cat){ _nav({v:'col',cat:cat}); }
+  function verProducto(id){ _nav({v:'prod',id:id}); }
+  window.addEventListener('popstate',function(e){ _render(e.state); });
   window.verColeccion=verColeccion; window.verHome=verHome; window.verProducto=verProducto;
 
   /* ---------- Age gate + menú ---------- */
