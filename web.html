@@ -749,7 +749,7 @@
   =========================================================== */
   var DBURL='https://temptress-bfdaa-default-rtdb.firebaseio.com/web.json';
   var WA='https://wa.link/834moo';
-  var DATA={ categorias:[], productos:[], carrusel:[], hero:null, tienda:null };
+  var DATA={ categorias:[], productos:[], carrusel:[], catFotos:{}, hero:null, tienda:null };
 
   /* ---------- helpers ---------- */
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -778,9 +778,11 @@
   /* ---------- render ---------- */
   function renderCategorias(){
     document.getElementById('catsGrid').innerHTML = DATA.categorias.map(function(c,i){
-      return '<a class="cat" data-cat="'+esc(c)+'">'+
-        '<div class="satin '+hue(i)+'"></div><div class="film"></div>'+
-        '<span class="mono">'+esc(c.trim().charAt(0).toUpperCase())+'</span>'+
+      var foto = DATA.catFotos && DATA.catFotos[c];
+      var bg = foto ? '<img class="ph-img" src="'+esc(foto)+'" alt="">' : '<div class="satin '+hue(i)+'"></div>';
+      var mono = foto ? '' : '<span class="mono">'+esc(c.trim().charAt(0).toUpperCase())+'</span>';
+      return '<a class="cat'+(foto?' con-foto':'')+'" data-cat="'+esc(c)+'">'+
+        bg+'<div class="film"></div>'+mono+
         '<div class="lab"><h3>'+esc(c)+'</h3><span class="go">Ver productos →</span></div></a>';
     }).join('');
     document.getElementById('footCats').innerHTML = DATA.categorias.map(function(c){
@@ -990,6 +992,7 @@
         eyebrow:s.cat||'Temptress', titulo:s.titulo||'', texto:s.texto||'',
         cta:s.cat?'Ver colección':'Ver más', cat:s.cat||'', foto:s.foto||null
       };});
+      DATA.catFotos=d.catFotos||{};
       DATA.tienda=d.tienda||null;
       DATA.hero=d.hero||null;
     }

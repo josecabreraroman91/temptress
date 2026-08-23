@@ -737,7 +737,7 @@ function borrarTodo(){
    escribe en el nodo /web, que es de lectura pública. Todo lo de la web
    vive en su propia pantalla (Vitrina), separado de Ajustes. */
 const WEB_URL='https://orbepy.com/temptress/web.html';
-function webAsegurar(){ if(!S.web)S.web={hero:{tagline:'',texto:''},carrusel:[]}; if(!S.web.hero)S.web.hero={tagline:'',texto:''}; if(!S.web.carrusel)S.web.carrusel=[]; return S.web; }
+function webAsegurar(){ if(!S.web)S.web={hero:{tagline:'',texto:''},carrusel:[]}; if(!S.web.hero)S.web.hero={tagline:'',texto:''}; if(!S.web.carrusel)S.web.carrusel=[]; if(!S.web.catFotos)S.web.catFotos={}; return S.web; }
 function vWeb(){
   const w=webAsegurar();
   const destN=S.productos.filter(p=>p.destacado&&stockDe(p)>0).length;
@@ -757,6 +757,19 @@ function vWeb(){
      '<div class="field"><label>Frase principal</label><input id="wb_tag" value="'+esc(w.hero.tagline||'')+'" placeholder="Placer con clase." oninput="S.web.hero.tagline=this.value"></div>'+
      '<div class="field"><label>Texto bajo la frase</label><input id="wb_txt" value="'+esc(w.hero.texto||'')+'" oninput="S.web.hero.texto=this.value"></div>'+
      '<button class="btn btn-brand" onclick="guardarHero()">Guardar portada</button></div>';
+  /* Portadas de colecciones */
+  h+='<div class="sectit">Portadas de colecciones</div><div class="card pad">'+
+     '<div class="hint" style="margin-bottom:10px">Opcional: poné una foto a cada colección y el recuadro la usa de fondo. Si no le ponés, queda el satén de la marca con la inicial. (Mejor si es una foto recortada / sin fondo.)</div>'+
+     S.categorias.map(function(c,idx){
+       var f=(S.web.catFotos||{})[c];
+       return '<div style="display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line-s);padding:9px 0">'+
+         '<div class="thumb" style="width:52px;height:52px;flex:none;font-size:20px">'+(f?'<img src="'+esc(f)+'">':'🖼️')+'</div>'+
+         '<div style="flex:1;font-weight:600">'+esc(c)+'</div>'+
+         '<label class="btn btn-ghost" style="width:auto;margin:0;padding:8px 12px;cursor:pointer">'+(f?'Cambiar':'📷 Foto')+'<input type="file" accept="image/*" style="display:none" onchange="fotoCat(this,'+idx+')"></label>'+
+         (f?'<button class="btn btn-danger" style="width:auto;padding:8px 12px" onclick="quitarFotoCat('+idx+')">Quitar</button>':'')+
+       '</div>';
+     }).join('')+
+     '</div>';
   /* Carrusel */
   h+='<div class="sectit">Carrusel <span class="cnt">'+w.carrusel.length+'</span></div><div class="card pad">'+
      '<div class="hint" style="margin-bottom:10px">Los slides que se ven arriba de todo. Ponele una imagen de fondo a cada uno y elegí a qué colección lleva.</div>';
@@ -789,6 +802,13 @@ function fotoSlide(inp,i){
   const f=inp.files&&inp.files[0];if(!f)return;
   comprimir(f,1000,d=>{ webAsegurar(); S.web.carrusel[i].foto=d; save(); render(); });
 }
+function fotoCat(inp,idx){
+  const c=S.categorias[idx]; const f=inp.files&&inp.files[0]; if(!c||!f)return;
+  comprimir(f,900,d=>{ webAsegurar(); S.web.catFotos[c]=d; save(); render(); });
+}
+function quitarFotoCat(idx){
+  const c=S.categorias[idx]; webAsegurar(); if(S.web.catFotos)delete S.web.catFotos[c]; save(); render();
+}
 function publicarWeb(){
   if(!_fbReady||!rol){toast('Necesitás estar conectado para publicar');return;}
   const productos=S.productos.filter(p=>stockDe(p)>0).map(p=>{
@@ -799,11 +819,14 @@ function publicarWeb(){
   if(!productos.length && !confirm('No hay productos con stock para mostrar. ¿Publicar igual (la web quedaría sin productos)?'))return;
   const conStock={}; productos.forEach(p=>conStock[p.cat]=true);
   const categorias=S.categorias.filter(c=>conStock[c]);   /* solo categorías que tienen algo en stock */
+  const catFotos={}; const _cf=(S.web&&S.web.catFotos)||{};
+  categorias.forEach(c=>{ if(_cf[c]) catFotos[c]=_cf[c]; });
   const web={
     tienda:{nombre:S.tienda.nombre, wa:S.tienda.wa||''},
     hero:(S.web&&S.web.hero)||{},
     carrusel:((S.web&&S.web.carrusel)||[]).filter(s=>s.titulo||s.foto),
     categorias:categorias,
+    catFotos:catFotos,
     productos:productos,
     ts:Date.now()
   };
